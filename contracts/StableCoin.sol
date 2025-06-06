@@ -220,4 +220,33 @@ contract RemittanceAndSavings is Ownable {
         return interestAmount;
     }
 
-    
+    /**
+     * @dev Allows users to withdraw their savings, including any earned interest.
+     */
+    function withdrawSavings() public {
+        require(savingsBalance[msg.sender] > 0, "No savings to withdraw");
+
+        uint256 currentSavings = savingsBalance[msg.sender];
+        uint256 earnedInterest = calculateInterest(msg.sender);
+
+        uint256 totalAmount = currentSavings + earnedInterest;
+
+        // Reset savings state
+        savingsBalance[msg.sender] = 0;
+        savingsStartTime[msg.sender] = 0;
+
+        require(stablecoin.transfer(msg.sender, totalAmount), "Failed to withdraw savings");
+
+        emit SavingsWithdrawn(msg.sender, currentSavings);
+        if (earnedInterest > 0) {
+            emit InterestEarned(msg.sender, earnedInterest);
+        }
+    }
+
+    /**
+     * @dev Allows the owner to withdraw any accidentally sent ETH from the contract.
+     */
+    function withdrawEth() public onlyOwner {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+}
