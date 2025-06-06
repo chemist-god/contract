@@ -122,5 +122,38 @@ contract RemittanceAndSavings is Ownable {
         return price;
     }
 
+    /**
+     * @dev Simulates buying stablecoins with ETH.
+     * Users send ETH to the contract, and stablecoins are minted and sent to them.
+     * In a real system, ETH would be swapped for stablecoins via a liquidity pool.
+     * @param amountToBuy Amount of stablecoin tokens to buy.
+     */
+    function buyStablecoinWithEth(uint256 amountToBuy) public payable {
+        require(amountToBuy > 0, "Amount to buy must be greater than zero");
+        require(msg.value > 0, "ETH sent must be greater than zero");
+
+        int256 ethUsdPrice = getLatestEthUsdPrice();
+        require(ethUsdPrice > 0, "Failed to get ETH/USD price");
+
+        // Calculate required ETH based on mock stablecoin peg to USD (e.g., 1 Stablecoin = 1 USD)
+        // This is a simplified calculation. A real system would use more precise conversion.
+        // Assuming 1 Stablecoin = 1 USD for simplicity.
+        // Amount of stablecoin requested (in USD equivalent) / (ETH price in USD / 10^8)
+        uint256 stablecoinUsdEquivalent = amountToBuy; // Assuming 1 Stablecoin = 1 USD
+        uint256 requiredEth = (stablecoinUsdEquivalent * (10 ** 18)) / (uint256(ethUsdPrice) / (10 ** 10)); // Adjust decimals
+
+        require(msg.value >= requiredEth, "Insufficient ETH sent for the requested amount");
+
+        // Mint stablecoins to the user
+        stablecoin.mint(msg.sender, amountToBuy);
+
+        // Refund any excess ETH
+        if (msg.value > requiredEth) {
+            payable(msg.sender).transfer(msg.value - requiredEth);
+        }
+
+        emit TokensSwapped(msg.sender, address(0), address(stablecoin), msg.value, amountToBuy);
+    }
+
     
 }
