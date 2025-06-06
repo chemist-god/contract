@@ -72,5 +72,25 @@ contract RemittanceAndSavings is Ownable {
     event SavingsWithdrawn(address indexed user, uint256 amount);
     event InterestEarned(address indexed user, uint256 interestAmount);
 
+    /**
+     * @dev Constructor to initialize the contract with the stablecoin address and Chainlink price feed addresses.
+     * @param _stablecoinAddress Address of the deployed AfricanStablecoin contract.
+     * @param _priceFeedEthUsd Address of the Chainlink ETH/USD price feed.
+     * @param _priceFeedUsdMockLocal Address of the Chainlink USD/Mock Local Currency price feed.
+     */
+    constructor(
+        address _stablecoinAddress,
+        address _priceFeedEthUsd,
+        address _priceFeedUsdMockLocal
+    ) {
+        require(_stablecoinAddress != address(0), "Invalid stablecoin address");
+        require(_priceFeedEthUsd != address(0), "Invalid ETH/USD price feed address");
+        require(_priceFeedUsdMockLocal != address(0), "Invalid USD/Local price feed address");
+
+        stablecoin = AfricanStablecoin(_stablecoinAddress);
+        priceFeedEthUsd = AggregatorV3Interface(_priceFeedEthUsd);
+        priceFeedUsdMockLocal = AggregatorV3Interface(_priceFeedUsdMockLocal);
+    }
+
     
 }
