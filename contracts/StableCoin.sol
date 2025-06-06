@@ -155,5 +155,32 @@ contract RemittanceAndSavings is Ownable {
         emit TokensSwapped(msg.sender, address(0), address(stablecoin), msg.value, amountToBuy);
     }
 
+    /**
+     * @dev Simulates selling stablecoins for ETH.
+     * Users approve stablecoins, and the contract sends them ETH.
+     * In a real system, stablecoins would be swapped for ETH via a liquidity pool.
+     * @param amountToSell Amount of stablecoin tokens to sell.
+     */
+    function sellStablecoinForEth(uint256 amountToSell) public {
+        require(amountToSell > 0, "Amount to sell must be greater than zero");
+        require(stablecoin.transferFrom(msg.sender, address(this), amountToSell), "Stablecoin transfer failed");
+
+        int256 ethUsdPrice = getLatestEthUsdPrice();
+        require(ethUsdPrice > 0, "Failed to get ETH/USD price");
+
+        // Calculate ETH to send based on mock stablecoin peg to USD
+        // Assuming 1 Stablecoin = 1 USD
+        uint256 ethToReturn = (amountToSell * (uint256(ethUsdPrice) / (10 ** 10))) / (10 ** 18); // Adjust decimals
+
+        require(address(this).balance >= ethToReturn, "Contract has insufficient ETH to refund");
+
+        payable(msg.sender).transfer(ethToReturn);
+
+        // Burn the stablecoins received by the contract
+        stablecoin.burn(address(this), amountToSell);
+
+        emit TokensSwapped(msg.sender, address(stablecoin), address(0), amountToSell, ethToReturn);
+    }
+
     
 }
