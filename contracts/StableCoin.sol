@@ -92,5 +92,20 @@ contract RemittanceAndSavings is Ownable {
         priceFeedUsdMockLocal = AggregatorV3Interface(_priceFeedUsdMockLocal);
     }
 
-    
+    /**
+     * @dev Gets the latest ETH/USD price from Chainlink.
+     * @return The latest price, multiplied by $10^8$.
+     */
+    function getLatestEthUsdPrice() public view returns (int256) {
+        (
+            /*uint80 roundID*/,
+            int256 price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = priceFeedEthUsd.latestRoundData();
+        return price;
+    }
+
+   
 }
