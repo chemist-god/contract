@@ -50,3 +50,27 @@ contract AfricanStablecoin is ERC20, Ownable {
         emit StablecoinBurned(from, amount);
     }
 }
+
+/**
+ * @title RemittanceAndSavings
+ * @dev A contract for cross-border remittances, token swapping/exchange, and savings features.
+ * This contract uses a mock "AfricanStablecoin" and integrates with Chainlink Price Feeds.
+ */
+contract RemittanceAndSavings is Ownable {
+    AfricanStablecoin public stablecoin; // The stablecoin contract
+    AggregatorV3Interface public priceFeedEthUsd; // Chainlink ETH/USD Price Feed
+    AggregatorV3Interface public priceFeedUsdMockLocal; // Chainlink USD/Mock Local Currency Price Feed (e.g., USD/GHS)
+
+    uint256 public constant SAVINGS_INTEREST_RATE_PER_YEAR = 5; // 5% annual interest rate (mock)
+    uint256 public constant SAVINGS_PERIOD_SECONDS = 30 days; // Savings period for interest calculation
+
+    mapping(address => uint256) public savingsBalance; // User's locked savings balance
+    mapping(address => uint256) public savingsStartTime; // Timestamp when savings started
+
+    event TokensSwapped(address indexed user, address indexed fromToken, address indexed toToken, uint256 amountIn, uint256 amountOut);
+    event SavingsDeposited(address indexed user, uint256 amount);
+    event SavingsWithdrawn(address indexed user, uint256 amount);
+    event InterestEarned(address indexed user, uint256 interestAmount);
+
+    
+}
