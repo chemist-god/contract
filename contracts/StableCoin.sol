@@ -182,5 +182,21 @@ contract RemittanceAndSavings is Ownable {
         emit TokensSwapped(msg.sender, address(stablecoin), address(0), amountToSell, ethToReturn);
     }
 
+    /**
+     * @dev Deposits stablecoins into a savings account.
+     * @param amount The amount of stablecoins to deposit.
+     */
+    function depositSavings(uint256 amount) public {
+        require(amount > 0, "Amount to deposit must be greater than zero");
+        require(stablecoin.transferFrom(msg.sender, address(this), amount), "Stablecoin transfer failed");
+
+        if (savingsBalance[msg.sender] == 0) {
+            savingsStartTime[msg.sender] = block.timestamp;
+        }
+        savingsBalance[msg.sender] += amount;
+
+        emit SavingsDeposited(msg.sender, amount);
+    }
+
     
 }
