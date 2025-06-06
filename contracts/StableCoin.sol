@@ -198,5 +198,26 @@ contract RemittanceAndSavings is Ownable {
         emit SavingsDeposited(msg.sender, amount);
     }
 
+    /**
+     * @dev Calculates the potential interest earned by a user.
+     * @param _user The address of the user.
+     * @return The calculated interest amount.
+     */
+    function calculateInterest(address _user) public view returns (uint256) {
+        if (savingsBalance[_user] == 0 || block.timestamp < savingsStartTime[_user] + SAVINGS_PERIOD_SECONDS) {
+            return 0; // No savings or not enough time passed for interest
+        }
+
+        uint256 timeElapsed = block.timestamp - savingsStartTime[_user];
+        uint256 periods = timeElapsed / SAVINGS_PERIOD_SECONDS;
+
+        // Simple interest calculation: Principal * Rate * Time (in years)
+        // Time is in seconds, so convert SAVINGS_PERIOD_SECONDS to years (approx) for mock
+        // For accurate, real-world interest, use a more robust time-based calculation.
+        // For simplicity, this example applies interest per SAVINGS_PERIOD_SECONDS.
+        uint256 interestAmount = (savingsBalance[_user] * SAVINGS_INTEREST_RATE_PER_YEAR * periods) / (100 * (365 days / SAVINGS_PERIOD_SECONDS));
+
+        return interestAmount;
+    }
+
     
-}
