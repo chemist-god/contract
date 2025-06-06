@@ -107,5 +107,20 @@ contract RemittanceAndSavings is Ownable {
         return price;
     }
 
-   
+    /**
+     * @dev Gets the latest USD/Mock Local Currency price from Chainlink.
+     * @return The latest price, multiplied by $10^8$.
+     */
+    function getLatestUsdMockLocalPrice() public view returns (int256) {
+        (
+            /*uint80 roundID*/,
+            int256 price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = priceFeedUsdMockLocal.latestRoundData();
+        return price;
+    }
+
+    
 }
