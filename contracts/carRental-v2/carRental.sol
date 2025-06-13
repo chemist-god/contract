@@ -240,5 +240,24 @@ contract CarRentalSystem {
         return result;
     }
 
-    
+    /**
+     * @dev Retrieves a list of all available cars.
+     * @return An array of car IDs that are currently available for rent.
+     */
+    function getRentableCars() public view returns (uint256[] memory) {
+        uint256[] memory availableCars = new uint256[](carCount);
+        uint256 currentCount = 0;
+        for (uint256 i = 1; i <= carCount; i++) {
+            if (cars[i].isAvailable) {
+                availableCars[currentCount] = cars[i].id;
+                currentCount++;
+            }
+        }
+        // Resize the array to fit the actual number of available cars
+        uint256[] memory result = new uint256[](currentCount);
+        for (uint256 i = 0; i < currentCount; i++) {
+            result[i] = availableCars[i];
+        }
+        return result;
+    }
 }
