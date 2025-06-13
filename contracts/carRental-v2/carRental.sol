@@ -148,5 +148,32 @@ contract CarRentalSystem {
         return true;
     }
 
+    /**
+     * @dev Allows the current renter to return a car.
+     * @param _carId The ID of the car to return.
+     * @return true if the car was successfully returned.
+     */
+    function returnCar(uint256 _carId)
+        public
+        onlyRenter(_carId)
+        returns (bool)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+
+        Car storage car = cars[_carId]; // Get a reference to the car
+
+        // Check if the rental period has ended. If it hasn't, the owner keeps the full rental.
+        // This is a simple implementation. A more advanced system might handle partial refunds.
+        // For this contract, we simply set the car as available again.
+
+        // Reset car status
+        car.isAvailable = true;
+        car.renter = address(0); // No current renter
+        car.rentedUntil = 0;     // Reset rented until timestamp
+
+        emit CarReturned(_carId, msg.sender, car.owner, block.timestamp);
+        return true;
+    }
+
     
 }
