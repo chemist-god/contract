@@ -21,5 +21,31 @@ contract CarRentalSystem {
         uint256 rentedUntil;    // Timestamp when the car is rented until (0 if not rented)
     }
 
-   
+    // Mapping to store cars by their unique ID
+    mapping(uint256 => Car) public cars;
+    // Counter for generating unique car IDs
+    uint256 public carCount;
+
+    // Events to log important actions
+    event CarAdded(
+        uint256 indexed carId,
+        address indexed owner,
+        string make,
+        string model,
+        uint256 rentalRate
+    );
+    event CarRented(
+        uint256 indexed carId,
+        address indexed renter,
+        uint256 amountPaid,
+        uint256 rentedUntil
+    );
+    event CarReturned(
+        uint256 indexed carId,
+        address indexed previousRenter,
+        address indexed owner,
+        uint256 returnTime
+    );
+
+    
 }
