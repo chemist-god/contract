@@ -78,5 +78,33 @@ contract CarRentalSystem {
         carCount = 0; // Initialize car count
     }
 
+    /**
+     * @dev Adds a new car to the rental system.
+     * @param _make The make of the car.
+     * @param _model The model of the car.
+     * @param _year The manufacturing year of the car.
+     * @param _rentalRate The daily rental rate of the car in Wei.
+     */
+    function addCar(
+        string calldata _make,
+        string calldata _model,
+        uint256 _year,
+        uint256 _rentalRate
+    ) public {
+        carCount++; // Increment car count for new ID
+        cars[carCount] = Car(
+            carCount,
+            _make,
+            _model,
+            _year,
+            _rentalRate,
+            true, // Initially available
+            payable(msg.sender), // The sender is the owner
+            address(0),  // No renter initially
+            0            // Not rented until initially
+        );
+        emit CarAdded(carCount, msg.sender, _make, _model, _rentalRate);
+    }
+
     
 }
