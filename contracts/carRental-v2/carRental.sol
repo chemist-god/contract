@@ -47,5 +47,36 @@ contract CarRentalSystem {
         uint256 returnTime
     );
 
+    /**
+     * @dev Modifier to restrict access to the car's owner.
+     */
+    modifier onlyOwner(uint256 _carId) {
+        require(msg.sender == cars[_carId].owner, "Only the car owner can call this function.");
+        _;
+    }
+
+    /**
+     * @dev Modifier to ensure the car is currently available.
+     */
+    modifier onlyAvailable(uint256 _carId) {
+        require(cars[_carId].isAvailable, "Car is not available for rent.");
+        _;
+    }
+
+    /**
+     * @dev Modifier to ensure the caller is the current renter of the car.
+     */
+    modifier onlyRenter(uint256 _carId) {
+        require(msg.sender == cars[_carId].renter, "Only the current renter can call this function.");
+        _;
+    }
+
+    /**
+     * @dev Constructor is not needed for this basic contract.
+     */
+    constructor() {
+        carCount = 0; // Initialize car count
+    }
+
     
 }
