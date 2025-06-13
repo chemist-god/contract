@@ -106,5 +106,47 @@ contract CarRentalSystem {
         emit CarAdded(carCount, msg.sender, _make, _model, _rentalRate);
     }
 
+    /**
+     * @dev Rents a car for a specified duration.
+     * @param _carId The ID of the car to rent.
+     * @param _rentalDuration The duration for which the car is rented, in days.
+     * @return true if the car was successfully rented.
+     */
+    function rentCar(uint256 _carId, uint256 _rentalDuration)
+        public
+        payable
+        onlyAvailable(_carId)
+        returns (bool)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        require(_rentalDuration > 0, "Rental duration must be greater than zero.");
+
+        Car storage car = cars[_carId]; // Get a reference to the car
+
+        // Calculate total rental amount
+        uint256 totalRentalAmount = car.rentalRate * _rentalDuration;
+        require(msg.value >= totalRentalAmount, "Insufficient payment for rental.");
+
+        // Transfer rental amount to the car owner
+        // Using `transfer` for security against reentrancy (though `call` is more flexible)
+        // For simplicity and to demonstrate basic transfer, `transfer` is used here.
+        // In a more complex system, consider pull payments or a separate payment processing logic.
+        (bool success, ) = car.owner.call{value: totalRentalAmount}("");
+        require(success, "Failed to transfer funds to owner.");
+
+        // Update car status
+        car.isAvailable = false;
+        car.renter = msg.sender;
+        car.rentedUntil = block.timestamp + (_rentalDuration * 1 days); // Calculate rented until timestamp
+
+        // If overpaid, refund the difference
+        if (msg.value > totalRentalAmount) {
+            payable(msg.sender).transfer(msg.value - totalRentalAmount);
+        }
+
+        emit CarRented(_carId, msg.sender, totalRentalAmount, car.rentedUntil);
+        return true;
+    }
+
     
 }
