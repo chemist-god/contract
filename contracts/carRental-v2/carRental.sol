@@ -175,5 +175,48 @@ contract CarRentalSystem {
         return true;
     }
 
+    /**
+     * @dev Retrieves details of a specific car.
+     * @param _carId The ID of the car.
+     * @return id The car's ID.
+     * @return make The car's make.
+     * @return model The car's model.
+     * @return year The car's year.
+     * @return rentalRate The car's rental rate.
+     * @return isAvailable The car's availability status.
+     * @return owner The car's owner address.
+     * @return renter The car's current renter address.
+     * @return rentedUntil The timestamp when the car is rented until.
+     */
+    function getCarDetails(uint256 _carId)
+        public
+        view
+        returns (
+            uint256 id,
+            string memory make,
+            string memory model,
+            uint256 year,
+            uint256 rentalRate,
+            bool isAvailable,
+            address owner,
+            address renter,
+            uint256 rentedUntil
+        )
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        Car storage car = cars[_carId];
+        return (
+            car.id,
+            car.make,
+            car.model,
+            car.year,
+            car.rentalRate,
+            car.isAvailable,
+            car.owner,
+            car.renter,
+            car.rentedUntil
+        );
+    }
+
     
 }
