@@ -218,5 +218,27 @@ contract CarRentalSystem {
         );
     }
 
+    /**
+     * @dev Retrieves a list of all cars owned by a specific address.
+     * @param _owner The address of the owner.
+     * @return An array of car IDs owned by the specified address.
+     */
+    function getOwnerCars(address _owner) public view returns (uint256[] memory) {
+        uint256[] memory ownerCars = new uint256[](carCount);
+        uint256 currentCount = 0;
+        for (uint256 i = 1; i <= carCount; i++) {
+            if (cars[i].owner == _owner) {
+                ownerCars[currentCount] = cars[i].id;
+                currentCount++;
+            }
+        }
+        // Resize the array to fit the actual number of owner cars
+        uint256[] memory result = new uint256[](currentCount);
+        for (uint256 i = 0; i < currentCount; i++) {
+            result[i] = ownerCars[i];
+        }
+        return result;
+    }
+
     
 }
