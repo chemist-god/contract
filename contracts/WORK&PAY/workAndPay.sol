@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/**
+ * @title WorkAndPayCarSystem
+ * @dev A smart contract for managing 'Work and Pay' car agreements.
+ * Owners can list cars, assign them to drivers, and drivers make installment payments.
+ * The contract tracks payments and allows owners to reclaim defaulting cars.
+ */
+contract WorkAndPayCarSystem {
+
+    // Struct to represent a car under a 'Work and Pay' agreement
+    struct Car {
+        uint256 id;                   // Unique ID for the car
+        string make;                  // Car manufacturer
+        string model;                 // Car model
+        uint256 year;                 // Manufacturing year
+        address payable owner;        // Original owner of the car (who initiated the W&P agreement)
+
+        bool isAvailableForAssignment; // True if the car is listed but not yet assigned to a driver
+        bool isUnderWorkAndPay;       // True if the car is currently assigned to a driver under W&P
+        address currentDriver;        // Address of the driver currently in the W&P agreement (address(0) if not assigned)
+
+        uint256 totalSalesPrice;      // Total amount driver needs to pay to 'buy' the car in Wei
+        uint256 installmentAmount;    // Amount due per payment interval in Wei
+        uint256 paymentFrequencyDays; // How often payments are due, in days (e.g., 7 for weekly, 30 for monthly)
+        uint256 lastPaymentTime;      // Timestamp of the last successful installment payment for the current driver
+        uint256 amountPaidByDriver;   // Total amount paid by the current driver for THIS agreement in Wei
+        bool isPaidOff;               // True if the total sales price has been paid by the current driver
+    }
+
+   
+}
