@@ -29,5 +29,45 @@ contract WorkAndPayCarSystem {
         bool isPaidOff;               // True if the total sales price has been paid by the current driver
     }
 
-   
+    // Mapping to store cars by their unique ID
+    mapping(uint256 => Car) public cars;
+    // Counter for generating unique car IDs
+    uint256 public carCount;
+
+    // Events to log important actions and state changes
+    event WorkAndPayCarAdded(
+        uint256 indexed carId,
+        address indexed owner,
+        string make,
+        string model,
+        uint256 totalSalesPrice,
+        uint256 installmentAmount,
+        uint256 paymentFrequencyDays
+    );
+    event CarAssigned(
+        uint256 indexed carId,
+        address indexed owner,
+        address indexed driver,
+        uint256 assignmentTime
+    );
+    event InstallmentPaid(
+        uint256 indexed carId,
+        address indexed driver,
+        uint256 amountPaidThisInstallment,
+        uint256 totalAmountPaid
+    );
+    event CarReclaimed(
+        uint256 indexed carId,
+        address indexed owner,
+        address indexed previousDriver,
+        uint256 reclaimTime
+    );
+    event CarPaidOff(
+        uint256 indexed carId,
+        address indexed driver,
+        address indexed originalOwner,
+        uint256 finalPaymentTime
+    );
+
+    
 }
