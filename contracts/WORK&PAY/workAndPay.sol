@@ -69,5 +69,40 @@ contract WorkAndPayCarSystem {
         uint256 finalPaymentTime
     );
 
-    
+    /**
+     * @dev Modifier to restrict access to the car's original owner.
+     */
+    modifier onlyOwner(uint256 _carId) {
+        require(msg.sender == cars[_carId].owner, "Only the car owner can call this function.");
+        _;
+    }
+
+    /**
+     * @dev Modifier to ensure the car is currently available for assignment.
+     */
+    modifier onlyAvailableForAssignment(uint256 _carId) {
+        require(cars[_carId].isAvailableForAssignment, "Car is not available for assignment.");
+        _;
+    }
+
+    /**
+     * @dev Modifier to ensure the car is currently under a Work and Pay agreement.
+     */
+    modifier onlyIfUnderWorkAndPay(uint256 _carId) {
+        require(cars[_carId].isUnderWorkAndPay, "Car is not currently under a Work and Pay agreement.");
+        _;
+    }
+
+    /**
+     * @dev Modifier to ensure the caller is the current assigned driver of the car.
+     */
+    modifier onlyAssignedDriver(uint256 _carId) {
+        require(msg.sender == cars[_carId].currentDriver, "Only the assigned driver can call this function.");
+        _;
+    }
+
+    constructor() {
+        carCount = 0; // Initialize car count
+    }
+
 }
