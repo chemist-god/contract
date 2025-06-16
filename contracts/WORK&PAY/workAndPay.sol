@@ -105,4 +105,47 @@ contract WorkAndPayCarSystem {
         carCount = 0; // Initialize car count
     }
 
+    /**
+     * @dev Adds a new car to be available for a 'Work and Pay' agreement.
+     * @param _make The make of the car.
+     * @param _model The model of the car.
+     * @param _year The manufacturing year of the car.
+     * @param _totalSalesPrice The total amount the driver needs to pay to acquire the car (in Wei).
+     * @param _installmentAmount The amount required for each installment payment (in Wei).
+     * @param _paymentFrequencyDays The interval between payments, in days (e.g., 7 for weekly).
+     */
+    function addWorkAndPayCar(
+        string calldata _make,
+        string calldata _model,
+        uint256 _year,
+        uint256 _totalSalesPrice,
+        uint256 _installmentAmount,
+        uint256 _paymentFrequencyDays
+    ) public {
+        require(_totalSalesPrice > 0, "Total sales price must be greater than zero.");
+        require(_installmentAmount > 0, "Installment amount must be greater than zero.");
+        require(_paymentFrequencyDays > 0, "Payment frequency must be greater than zero days.");
+        require(_installmentAmount <= _totalSalesPrice, "Installment amount cannot exceed total sales price.");
+
+        carCount++; // Increment car count for new ID
+        cars[carCount] = Car(
+            carCount,
+            _make,
+            _model,
+            _year,
+            payable(msg.sender),        // The sender is the original owner
+            true,                        // Initially available for assignment
+            false,                       // Not yet under W&P agreement
+            address(0),                  // No driver initially
+            _totalSalesPrice,
+            _installmentAmount,
+            _paymentFrequencyDays,
+            0,                           // No last payment time initially
+            0,                           // No amount paid initially
+            false                        // Not paid off initially
+        );
+        emit WorkAndPayCarAdded(carCount, msg.sender, _make, _model, _totalSalesPrice, _installmentAmount, _paymentFrequencyDays);
+    }
+
+    
 }
