@@ -172,5 +172,52 @@ contract WorkAndPayCarSystem {
         emit CarAssigned(_carId, msg.sender, _driverAddress, block.timestamp);
     }
 
+    /**
+     * @dev Allows the assigned driver to make an installment payment.
+     * The payment amount must be at least the required installment.
+     * @param _carId The ID of the car for which to make a payment.
+     */
+    function makeInstallmentPayment(uint256 _carId)
+        public
+        payable
+        onlyAssignedDriver(_carId)
+        onlyIfUnderWorkAndPay(_carId)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        Car storage car = cars[_carId];
+
+        // Ensure at least the installment amount is sent
+        require(msg.value >= car.installmentAmount, "Insufficient payment: must send at least the installment amount.");
+
+        // Check if payment is overdue (optional grace period can be added here)
+        uint256 nextPaymentDueTime = car.lastPaymentTime + (car.paymentFrequencyDays * 1 days);
+        require(block.timestamp >= nextPaymentDueTime || car.amountPaidByDriver == 0, "Payment not due yet or car not assigned.");
+
+        // Transfer payment to the owner
+        (bool success, ) = car.owner.call{value: msg.value}("");
+        require(success, "Failed to transfer funds to owner.");
+
+        car.amountPaidByDriver += msg.value;
+        car.lastPaymentTime = block.timestamp;
+
+        // Check if the car is fully paid off
+        if (car.amountPaidByDriver >= car.totalSalesPrice) {
+            car.isPaidOff = true;
+            car.isUnderWorkAndPay = false; // Agreement concluded
+            car.isAvailableForAssignment = false; // No longer available for new W&P as it's paid off
+            car.currentDriver = address(0); // Clear driver as agreement is over
+
+            // Refund any overpayment
+            uint256 overpayment = car.amountPaidByDriver - car.totalSalesPrice;
+            if (overpayment > 0) {
+                payable(msg.sender).transfer(overpayment);
+            }
+
+            emit CarPaidOff(_carId, msg.sender, car.owner, block.timestamp);
+        }
+
+        emit InstallmentPaid(_carId, msg.sender, msg.value, car.amountPaidByDriver);
+    }
+
     
 }
