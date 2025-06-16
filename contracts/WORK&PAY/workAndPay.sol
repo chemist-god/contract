@@ -147,5 +147,30 @@ contract WorkAndPayCarSystem {
         emit WorkAndPayCarAdded(carCount, msg.sender, _make, _model, _totalSalesPrice, _installmentAmount, _paymentFrequencyDays);
     }
 
+    /**
+     * @dev Assigns an available 'Work and Pay' car to a driver.
+     * Only the car owner can assign it.
+     * @param _carId The ID of the car to assign.
+     * @param _driverAddress The address of the driver to assign the car to.
+     */
+    function assignCarToDriver(uint256 _carId, address _driverAddress)
+        public
+        onlyOwner(_carId)
+        onlyAvailableForAssignment(_carId)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        require(_driverAddress != address(0), "Driver address cannot be zero.");
+
+        Car storage car = cars[_carId];
+        car.isAvailableForAssignment = false;
+        car.isUnderWorkAndPay = true;
+        car.currentDriver = _driverAddress;
+        car.lastPaymentTime = block.timestamp; // First payment period starts now
+        car.amountPaidByDriver = 0; // Reset for this new agreement
+        car.isPaidOff = false; // Reset for this new agreement
+
+        emit CarAssigned(_carId, msg.sender, _driverAddress, block.timestamp);
+    }
+
     
 }
