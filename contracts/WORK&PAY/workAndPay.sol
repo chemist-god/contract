@@ -219,5 +219,40 @@ contract WorkAndPayCarSystem {
         emit InstallmentPaid(_carId, msg.sender, msg.value, car.amountPaidByDriver);
     }
 
+    /**
+     * @dev Allows the original owner to reclaim a car if the driver has defaulted on payments.
+     * A car is considered defaulted if the current time is beyond the next due payment time
+     * and the total amount paid is less than the total sales price.
+     * @param _carId The ID of the car to reclaim.
+     */
+    function reclaimCar(uint256 _carId)
+        public
+        onlyOwner(_carId)
+        onlyIfUnderWorkAndPay(_carId)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        Car storage car = cars[_carId];
+
+        require(!car.isPaidOff, "Car is already paid off.");
+
+        // Calculate the next expected payment due time
+        uint256 nextPaymentDueTime = car.lastPaymentTime + (car.paymentFrequencyDays * 1 days);
+
+        // Check if the payment is overdue
+        require(block.timestamp > nextPaymentDueTime, "Payment is not yet overdue.");
+
+        // Store previous driver for event logging
+        address previousDriver = car.currentDriver;
+
+        // Reset car status to be available for assignment again
+        car.isAvailableForAssignment = true;
+        car.isUnderWorkAndPay = false;
+        car.currentDriver = address(0);
+        car.lastPaymentTime = 0; // Reset payment tracking
+        car.amountPaidByDriver = 0; // Reset paid amount for new agreement
+
+        emit CarReclaimed(_carId, msg.sender, previousDriver, block.timestamp);
+    }
+
     
 }
