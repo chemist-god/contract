@@ -254,5 +254,50 @@ contract WorkAndPayCarSystem {
         emit CarReclaimed(_carId, msg.sender, previousDriver, block.timestamp);
     }
 
+    /**
+     * @dev Retrieves details of a specific 'Work and Pay' car.
+     * @param _carId The ID of the car.
+     * @return All relevant details of the car for Work and Pay.
+     */
+    function getCarDetails(uint256 _carId)
+        public
+        view
+        returns (
+            uint256 id,
+            string memory make,
+            string memory model,
+            uint256 year,
+            address owner,
+            bool isAvailableForAssignment,
+            bool isUnderWorkAndPay,
+            address currentDriver,
+            uint256 totalSalesPrice,
+            uint256 installmentAmount,
+            uint256 paymentFrequencyDays,
+            uint256 lastPaymentTime,
+            uint256 amountPaidByDriver,
+            bool isPaidOff
+        )
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        Car storage car = cars[_carId];
+        return (
+            car.id,
+            car.make,
+            car.model,
+            car.year,
+            car.owner,
+            car.isAvailableForAssignment,
+            car.isUnderWorkAndPay,
+            car.currentDriver,
+            car.totalSalesPrice,
+            car.installmentAmount,
+            car.paymentFrequencyDays,
+            car.lastPaymentTime,
+            car.amountPaidByDriver,
+            car.isPaidOff
+        );
+    }
+
     
 }
