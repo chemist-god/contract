@@ -299,5 +299,33 @@ contract WorkAndPayCarSystem {
         );
     }
 
+    /**
+     * @dev Calculates the amount currently due for an installment for a given car.
+     * @param _carId The ID of the car.
+     * @return The amount due in Wei. Returns 0 if not due or car not under W&P.
+     */
+    function getAmountDue(uint256 _carId)
+        public
+        view
+        returns (uint256)
+    {
+        require(_carId > 0 && _carId <= carCount, "Invalid car ID.");
+        Car storage car = cars[_carId];
+
+        if (!car.isUnderWorkAndPay || car.isPaidOff) {
+            return 0; // Not under W&P or already paid off
+        }
+
+        uint256 nextPaymentDueTime = car.lastPaymentTime + (car.paymentFrequencyDays * 1 days);
+
+        if (block.timestamp >= nextPaymentDueTime) {
+            // If overdue, the installment is due.
+            // If initial assignment and no payment has been made, the first installment is due.
+            return car.installmentAmount;
+        } else {
+            return 0; // Payment not due yet
+        }
+    }
+
     
 }
