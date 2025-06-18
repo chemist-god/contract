@@ -347,5 +347,23 @@ contract WorkAndPayCarSystem {
         return result;
     }
 
-    
+    /**
+     * @dev Retrieves a list of all cars currently under a 'Work and Pay' agreement.
+     * @return An array of car IDs that are currently assigned to a driver.
+     */
+    function getAssignedWorkAndPayCars() public view returns (uint256[] memory) {
+        uint256[] memory assignedCars = new uint256[](carCount);
+        uint256 currentCount = 0;
+        for (uint256 i = 1; i <= carCount; i++) {
+            if (cars[i].isUnderWorkAndPay) {
+                assignedCars[currentCount] = cars[i].id;
+                currentCount++;
+            }
+        }
+        uint256[] memory result = new uint256[](currentCount);
+        for (uint256 i = 0; i < currentCount; i++) {
+            result[i] = assignedCars[i];
+        }
+        return result;
+    }
 }
