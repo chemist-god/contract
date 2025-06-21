@@ -48,5 +48,57 @@ contract MarketWomenVendorManagement {
     // Dispute management
     Dispute[] public disputes;
 
-   
+    // Events
+    event VendorRegistered(address vendor, string name, uint256 stallNumber);
+    event GoodsDeclared(address vendor, uint256 goodsId, string description, uint256 quantity);
+    event GoodsSold(address vendor, uint256 goodsId, address buyer);
+    event DisputeRaised(uint256 disputeId, address vendor, string issue);
+    event DisputeResolved(uint256 disputeId, bool outcome);
+
+    modifier onlyMarketAuthority() {
+        require(msg.sender == marketAuthority, "Only market authority allowed");
+        _;
+    }
+
+    modifier onlyRegisteredVendor() {
+        require(vendors[msg.sender].registered && vendors[msg.sender].active, "Not an active registered vendor");
+        _;
+    }
+
+    // Register vendor and assign stall if available
+    function registerVendor(string memory _name) public {
+        require(!vendors[msg.sender].registered, "Already registered");
+        // Find first available stall
+        uint256 assignedStall = 0;
+        bool stallFound = false;
+        for (uint256 i = 1; i <= totalStalls; i++) {
+            bool occupied = false;
+            // Check if stall is occupied
+            for (address addr = address(0); addr <= address(type(uint160).max); addr = address(uint160(addr) + 1)) {
+                if (vendors[addr].stallNumber == i && vendors[addr].active) {
+                    occupied = true;
+                    break;
+                }
+            }
+            if (!occupied) {
+                assignedStall = i;
+                stallFound = true;
+                break;
+            }
+        }
+        require(stallFound, "No stalls available");
+
+        vendors[msg.sender] = Vendor({
+            name: _name,
+            vendorAddress: msg.sender,
+            registered: true,
+            stallNumber: assignedStall,
+            active: true
+        });
+        vendorStall[msg.sender] = assignedStall;
+
+        emit VendorRegistered(msg.sender, _name, assignedStall);
+    }
+
+    
 }
