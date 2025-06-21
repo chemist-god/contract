@@ -100,5 +100,85 @@ contract MarketWomenVendorManagement {
         emit VendorRegistered(msg.sender, _name, assignedStall);
     }
 
-    
+    // Vendor declares goods imported for sale
+    function declareGoods(string memory _description, uint256 _quantity) public onlyRegisteredVendor {
+        require(_quantity > 0, "Quantity must be positive");
+        goodsCount++;
+        goodsList[goodsCount] = Goods({
+            description: _description,
+            quantity: _quantity,
+            sold: false
+        });
+
+        emit GoodsDeclared(msg.sender, goodsCount, _description, _quantity);
+    }
+
+    // Record sale of goods to buyer
+    function recordSale(uint256 _goodsId, address _buyer) public onlyRegisteredVendor {
+        require(_goodsId > 0 && _goodsId <= goodsCount, "Invalid goods ID");
+        Goods storage item = goodsList[_goodsId];
+        require(!item.sold, "Goods already sold");
+
+        item.sold = true;
+        goodsSales[_goodsId].push(Sale({
+            buyer: _buyer,
+            goodsId: _goodsId,
+            timestamp: block.timestamp
+        }));
+
+        emit GoodsSold(msg.sender, _goodsId, _buyer);
+    }
+
+    // Raise dispute by vendor
+    function raiseDispute(string memory _issue) public onlyRegisteredVendor {
+        Dispute storage newDispute = disputes.push();
+        newDispute.vendor = msg.sender;
+        newDispute.issue = _issue;
+        newDispute.resolved = false;
+        newDispute.resolutionVotesYes = 0;
+        newDispute.resolutionVotesNo = 0;
+
+        emit DisputeRaised(disputes.length - 1, msg.sender, _issue);
+    }
+
+    // Voting on dispute resolution by market authority or designated committee
+    function voteDispute(uint256 _disputeId, bool _voteYes) public onlyMarketAuthority {
+        require(_disputeId < disputes.length, "Invalid dispute ID");
+        Dispute storage dispute = disputes[_disputeId];
+        require(!dispute.resolved, "Dispute already resolved");
+        require(!dispute.voted[msg.sender], "Already voted");
+
+        dispute.voted[msg.sender] = true;
+        if (_voteYes) {
+            dispute.resolutionVotesYes++;
+        } else {
+            dispute.resolutionVotesNo++;
+        }
+
+        // Simple majority resolution example
+        if (dispute.resolutionVotesYes + dispute.resolutionVotesNo >= 3) { // e.g., 3 votes needed
+            dispute.resolved = true;
+            bool outcome = dispute.resolutionVotesYes > dispute.resolutionVotesNo;
+            emit DisputeResolved(_disputeId, outcome);
+            // Implement outcome effects here (e.g., penalties, reinstatement)
+        }
+    }
+
+    // Deactivate vendor (e.g., penalty or suspension)
+    function deactivateVendor(address _vendor) public onlyMarketAuthority {
+        require(vendors[_vendor].registered, "Vendor not registered");
+        vendors[_vendor].active = false;
+    }
+
+    // Reactivate vendor
+    function reactivateVendor(address _vendor) public onlyMarketAuthority {
+        require(vendors[_vendor].registered, "Vendor not registered");
+        vendors[_vendor].active = true;
+    }
+
+    // Get vendor info
+    function getVendor(address _vendor) public view returns (string memory, uint256, bool) {
+        Vendor memory v = vendors[_vendor];
+        return (v.name, v.stallNumber, v.active);
+    }
 }
