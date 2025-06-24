@@ -33,5 +33,27 @@ contract MedicalToolTracker {
         admin = msg.sender;
     }
 
-    
+    function approvePersonnel(address _user) external onlyAdmin {
+        approvedPersonnel[_user] = true;
+    }
+
+    function registerTool(string memory _toolType, string memory _batchId) external onlyApproved returns (uint256) {
+        tools[toolCount] = Tool({
+            toolType: _toolType,
+            batchId: _batchId,
+            hospital: msg.sender,
+            registeredAt: block.timestamp,
+            status: ToolStatus.Registered,
+            lastHandledBy: address(0)
+        });
+        return toolCount++;
+    }
+
+    function markInUse(uint256 _toolId) external onlyApproved {
+        Tool storage tool = tools[_toolId];
+        require(tool.status == ToolStatus.Registered, "Tool already used");
+        tool.status = ToolStatus.InUse;
+        tool.lastHandledBy = msg.sender;
+    }
+
 }
