@@ -56,4 +56,24 @@ contract MedicalToolTracker {
         tool.lastHandledBy = msg.sender;
     }
 
+    function markSterilized(uint256 _toolId) external onlyApproved {
+        Tool storage tool = tools[_toolId];
+        require(tool.status == ToolStatus.InUse, "Tool must be in use");
+        tool.status = ToolStatus.Sterilized;
+        tool.lastHandledBy = msg.sender;
+    }
+
+    function markDisposed(uint256 _toolId) external onlyApproved {
+        Tool storage tool = tools[_toolId];
+        require(
+            tool.status == ToolStatus.InUse || tool.status == ToolStatus.Sterilized,
+            "Tool must be used or sterilized first"
+        );
+        tool.status = ToolStatus.Disposed;
+        tool.lastHandledBy = msg.sender;
+    }
+
+    function getToolDetails(uint256 _toolId) external view returns (Tool memory) {
+        return tools[_toolId];
+    }
 }
