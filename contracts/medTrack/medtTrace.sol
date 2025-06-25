@@ -52,5 +52,14 @@ contract MedTrace {
     event RoleRevoked(address indexed account, string role);
 
 
+    // --- Constructor ---
+    constructor() {
+        admin = msg.sender; // Deployer is the initial admin
+        manufacturers[msg.sender] = true; // For testing, deployer is also a manufacturer initially
+        sterilizationUnits[msg.sender] = true; // For testing, deployer is also a sterilization unit
+        healthcareProfessionals[msg.sender] = true; // For testing, deployer is also a healthcare professional
+        disposalUnits[msg.sender] = true; // For testing, deployer is also a disposal unit
+    }
+
     
 }
