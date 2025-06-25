@@ -43,5 +43,14 @@ contract MedTrace {
     mapping(address => bool) public disposalUnits;
     address public admin; // Single admin for this PoC, can be multi-sig in production
 
+    // Events to log important actions on the blockchain
+    event ToolRegistered(string indexed toolID, ToolType toolType, bool isReusable, address manufacturer);
+    event ToolSterilized(string indexed toolID, SterilizationMethod method, address unit, uint256 timestamp);
+    event ToolUsed(string indexed toolID, bytes32 indexed patientHash, string procedure, address professional, uint256 timestamp);
+    event ToolDisposed(string indexed toolID, address unit, uint256 timestamp);
+    event RoleGranted(address indexed account, string role);
+    event RoleRevoked(address indexed account, string role);
+
+
     
 }
