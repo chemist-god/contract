@@ -23,4 +23,14 @@ contract MedTrace {
         uint256 usageCount;         // Number of times the tool has been used since last sterilization
     }
 
+    // Struct to log an event in the tool's history
+    struct ToolEvent {
+        string toolID;
+        string eventType;           // "Sterilization", "Usage", "Disposal", "Registration"
+        uint256 timestamp;
+        address performer;          // Address of the entity performing the action
+        string details;             // Additional relevant details (e.g., sterilization method, procedure, patient hash)
+    }
+
+   
 }
