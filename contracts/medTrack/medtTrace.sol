@@ -32,5 +32,16 @@ contract MedTrace {
         string details;             // Additional relevant details (e.g., sterilization method, procedure, patient hash)
     }
 
-   
+    // Mappings for storing data
+    mapping(string => MedicalTool) public medicalTools; // toolID => MedicalTool details
+    mapping(string => ToolEvent[]) public toolHistory;  // toolID => Array of events
+
+    // Role-based access control
+    mapping(address => bool) public manufacturers;
+    mapping(address => bool) public sterilizationUnits;
+    mapping(address => bool) public healthcareProfessionals;
+    mapping(address => bool) public disposalUnits;
+    address public admin; // Single admin for this PoC, can be multi-sig in production
+
+    
 }
