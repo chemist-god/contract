@@ -61,5 +61,31 @@ contract MedTrace {
         disposalUnits[msg.sender] = true; // For testing, deployer is also a disposal unit
     }
 
-    
+    // --- Modifiers for Access Control ---
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
+
+    modifier onlyManufacturer() {
+        require(manufacturers[msg.sender], "Only manufacturers can register tools");
+        _;
+    }
+
+    modifier onlySterilizationUnit() {
+        require(sterilizationUnits[msg.sender], "Only sterilization units can sterilize tools");
+        _;
+    }
+
+    modifier onlyHealthcareProfessional() {
+        require(healthcareProfessionals[msg.sender], "Only healthcare professionals can use tools");
+        _;
+    }
+
+    modifier onlyDisposalUnit() {
+        require(disposalUnits[msg.sender], "Only disposal units can dispose tools");
+        _;
+    }
+
+  
 }
