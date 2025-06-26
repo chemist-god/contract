@@ -87,5 +87,24 @@ contract MedTrace {
         _;
     }
 
-  
+    // --- Admin Functions (for managing roles) ---
+    function grantRole(address _account, string memory _role) public onlyAdmin {
+        if (keccak256(abi.encodePacked(_role)) == keccak256(abi.encodePacked("manufacturer"))) {
+            manufacturers[_account] = true;
+            emit RoleGranted(_account, "manufacturer");
+        } else if (keccak256(abi.encodePacked(_role)) == keccak256(abi.encodePacked("sterilizationUnit"))) {
+            sterilizationUnits[_account] = true;
+            emit RoleGranted(_account, "sterilizationUnit");
+        } else if (keccak256(abi.encodePacked(_role)) == keccak256(abi.encodePacked("healthcareProfessional"))) {
+            healthcareProfessionals[_account] = true;
+            emit RoleGranted(_account, "healthcareProfessional");
+        } else if (keccak256(abi.encodePacked(_role)) == keccak256(abi.encodePacked("disposalUnit"))) {
+            disposalUnits[_account] = true;
+            emit RoleGranted(_account, "disposalUnit");
+        } else {
+            revert("Invalid role");
+        }
+    }
+
+
 }
