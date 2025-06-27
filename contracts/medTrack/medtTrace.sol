@@ -159,5 +159,34 @@ contract MedTrace {
         emit ToolRegistered(_toolID, _toolType, _isReusable, msg.sender);
     }
 
+    /**
+     * @dev Logs a sterilization event for a reusable tool.
+     * @param _toolID The ID of the tool being sterilized.
+     * @param _method The sterilization method used.
+     * @param _sterilizationResultHash A hash of the sterilization report/sensor data (future IoT integration).
+     */
+    function sterilizeTool(string memory _toolID, SterilizationMethod _method, bytes32 _sterilizationResultHash) public onlySterilizationUnit {
+        MedicalTool storage tool = medicalTools[_toolID];
+        require(bytes(tool.toolID).length > 0, "Tool not registered");
+        require(tool.isReusable, "Only reusable tools can be sterilized");
+        require(!tool.isDisposed, "Tool has already been disposed");
+
+        tool.isSterile = true;
+        tool.lastSterilizationTime = block.timestamp;
+        tool.lastUsedBy = address(0); // Reset last user
+        tool.lastPatientHash = bytes32(0); // Reset last patient
+        tool.usageCount = 0; // Reset usage count after sterilization
+
+        toolHistory[_toolID].push(ToolEvent({
+            toolID: _toolID,
+            eventType: "Sterilization",
+            timestamp: block.timestamp,
+            performer: msg.sender,
+            details: string(abi.encodePacked("Method: ", uintToString(uint256(_method)), ", Result Hash: ", bytes32ToString(_sterilizationResultHash)))
+        }));
+
+        emit ToolSterilized(_toolID, _method, msg.sender, block.timestamp);
+    }
+
     
 }
