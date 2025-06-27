@@ -188,5 +188,33 @@ contract MedTrace {
         emit ToolSterilized(_toolID, _method, msg.sender, block.timestamp);
     }
 
+    /**
+     * @dev Logs the usage of a medical tool.
+     * @param _toolID The ID of the tool being used.
+     * @param _patientIDHash Hashed ID of the patient (for privacy).
+     * @param _procedureType The type of medical procedure.
+     */
+    function useTool(string memory _toolID, bytes32 _patientIDHash, string memory _procedureType) public onlyHealthcareProfessional {
+        MedicalTool storage tool = medicalTools[_toolID];
+        require(bytes(tool.toolID).length > 0, "Tool not registered");
+        require(!tool.isDisposed, "Tool has already been disposed");
+        require(tool.isSterile, "Tool is not sterile and cannot be used");
+
+        tool.isSterile = false; // A tool is no longer sterile after use
+        tool.lastUsedBy = msg.sender;
+        tool.lastPatientHash = _patientIDHash;
+        tool.usageCount++;
+
+        toolHistory[_toolID].push(ToolEvent({
+            toolID: _toolID,
+            eventType: "Usage",
+            timestamp: block.timestamp,
+            performer: msg.sender,
+            details: string(abi.encodePacked("Patient Hash: ", bytes32ToString(_patientIDHash), ", Procedure: ", _procedureType))
+        }));
+
+        emit ToolUsed(_toolID, _patientIDHash, _procedureType, msg.sender, block.timestamp);
+    }
+
     
 }
