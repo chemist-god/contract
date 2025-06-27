@@ -22,6 +22,23 @@ contract MedTrace {
         bytes32 lastPatientHash;    // Hashed ID of the last patient it was used on (for privacy)
         uint256 usageCount;         // Number of times the tool has been used since last sterilization
     }
+    
+    // --- Helper Functions ---
+
+    /**
+     * @dev Converts a bytes32 value to its ASCII string representation.
+     */
+    function bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
+        uint8 i = 0;
+        while(i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (uint8 j = 0; j < i; j++) {
+            bytesArray[j] = _bytes32[j];
+        }
+        return string(bytesArray);
+    }
 
     // Struct to log an event in the tool's history
     struct ToolEvent {
