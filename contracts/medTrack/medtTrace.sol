@@ -124,5 +124,40 @@ contract MedTrace {
         }
     }
 
- 
+    // --- Core Functions ---
+
+    /**
+     * @dev Registers a new medical tool.
+     * @param _toolID Unique identifier for the tool.
+     * @param _toolType Type of the tool (from enum).
+     * @param _isReusable True if the tool can be reused after sterilization.
+     */
+    function registerTool(string memory _toolID, ToolType _toolType, bool _isReusable) public onlyManufacturer {
+        require(bytes(medicalTools[_toolID].toolID).length == 0, "Tool ID already registered");
+
+        medicalTools[_toolID] = MedicalTool({
+            toolID: _toolID,
+            toolType: _toolType,
+            manufacturerDate: block.timestamp,
+            isReusable: _isReusable,
+            isSterile: _isReusable ? false : true, // Disposable tools are considered sterile on registration, reusable are not until sterilized
+            isDisposed: false,
+            lastSterilizationTime: 0,
+            lastUsedBy: address(0),
+            lastPatientHash: bytes32(0),
+            usageCount: 0
+        });
+
+        toolHistory[_toolID].push(ToolEvent({
+            toolID: _toolID,
+            eventType: "Registration",
+            timestamp: block.timestamp,
+            performer: msg.sender,
+            details: string(abi.encodePacked("Type: ", uintToString(uint256(_toolType)), ", Reusable: ", _isReusable ? "Yes" : "No"))
+        }));
+
+        emit ToolRegistered(_toolID, _toolType, _isReusable, msg.sender);
+    }
+
+    
 }
