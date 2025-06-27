@@ -233,5 +233,28 @@ contract MedTrace {
         emit ToolUsed(_toolID, _patientIDHash, _procedureType, msg.sender, block.timestamp);
     }
 
+    /**
+     * @dev Logs the disposal of a medical tool.
+     * @param _toolID The ID of the tool being disposed.
+     */
+    function disposeTool(string memory _toolID) public onlyDisposalUnit {
+        MedicalTool storage tool = medicalTools[_toolID];
+        require(bytes(tool.toolID).length > 0, "Tool not registered");
+        require(!tool.isDisposed, "Tool already marked as disposed");
+
+        tool.isDisposed = true;
+        tool.isSterile = false; // Cannot be sterile if disposed
+
+        toolHistory[_toolID].push(ToolEvent({
+            toolID: _toolID,
+            eventType: "Disposal",
+            timestamp: block.timestamp,
+            performer: msg.sender,
+            details: "Tool permanently disposed."
+        }));
+
+        emit ToolDisposed(_toolID, msg.sender, block.timestamp);
+    }
+
     
 }
