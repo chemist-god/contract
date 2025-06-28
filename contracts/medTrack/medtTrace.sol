@@ -297,5 +297,18 @@ contract MedTrace {
         }
         return string(b);
     }
+
+    function bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
+        bytes memory b = new bytes(64); // Each byte is two hex chars
+        for (uint i = 0; i < 32; i++) {
+            uint8 byteVal = uint8(_bytes32[i]);
+            uint8 highNibble = (byteVal >> 4) & 0x0F;
+            uint8 lowNibble = byteVal & 0x0F;
+            b[i * 2] = _toAsciiChar(highNibble);
+            b[i * 2 + 1] = _toAsciiChar(lowNibble);
+        }
+        return string(b);
+    }
+
    
 }
