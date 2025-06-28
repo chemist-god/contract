@@ -256,5 +256,17 @@ contract MedTrace {
         emit ToolDisposed(_toolID, msg.sender, block.timestamp);
     }
 
+    // --- Query Functions ---
+
+    /**
+     * @dev Gets the current status of a medical tool.
+     * @param _toolID The ID of the tool.
+     * @return The MedicalTool struct.
+     */
+    function getToolStatus(string memory _toolID) public view returns (MedicalTool memory) {
+        require(bytes(medicalTools[_toolID].toolID).length > 0, "Tool not registered");
+        return medicalTools[_toolID];
+    }
+
     
 }
