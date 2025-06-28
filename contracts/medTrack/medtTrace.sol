@@ -268,5 +268,15 @@ contract MedTrace {
         return medicalTools[_toolID];
     }
 
-    
+    /**
+     * @dev Gets the entire history of a medical tool.
+     * @param _toolID The ID of the tool.
+     * @return An array of ToolEvent structs.
+     */
+    function getToolHistory(string memory _toolID) public view returns (ToolEvent[] memory) {
+        require(bytes(medicalTools[_toolID].toolID).length > 0, "Tool not registered");
+        return toolHistory[_toolID];
+    }
+
+   
 }
