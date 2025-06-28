@@ -278,5 +278,24 @@ contract MedTrace {
         return toolHistory[_toolID];
     }
 
+    // --- Utility Functions (for string conversions in events/details) ---
+    function uintToString(uint256 v) internal pure returns (string memory) {
+        if (v == 0) {
+            return "0";
+        }
+        uint256 x = v;
+        uint256 s = 0;
+        while (x > 0) {
+            x /= 10;
+            s++;
+        }
+        bytes memory b = new bytes(s);
+        while (v > 0) {
+            s--;
+            b[s] = bytes1(uint8(48 + v % 10));
+            v /= 10;
+        }
+        return string(b);
+    }
    
 }
