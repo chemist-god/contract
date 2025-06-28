@@ -310,5 +310,11 @@ contract MedTrace {
         return string(b);
     }
 
-   
+   function _toAsciiChar(uint8 nibble) internal pure returns (bytes1) {
+        if (nibble < 10) {
+            return bytes1(uint8(48 + nibble)); // '0' through '9'
+        } else {
+            return bytes1(uint8(97 + (nibble - 10))); // 'a' through 'f'
+        }
+    }
 }
