@@ -17,5 +17,18 @@ contract SUSURotationalFund {
     uint256 public totalContributed;
     uint256 public lastPayoutTime;
 
+    constructor(uint256 _amount, uint256 _interval) {
+        organizer = msg.sender;
+        contributionAmount = _amount;
+        payoutInterval = _interval;
+        currentRound = 0;
+        lastPayoutTime = block.timestamp;
+    }
+
+    modifier onlyOrganizer() {
+        require(msg.sender == organizer, "Not authorized");
+        _;
+    }
+
     
 }
