@@ -43,5 +43,25 @@ contract SUSURotationalFund {
         totalContributed += msg.value;
     }
 
+    function payout() external {
+        require(block.timestamp >= lastPayoutTime + payoutInterval, "Not time yet");
+        require(members.length > currentRound, "No recipient available");
+
+        address payable recipient = payable(members[currentRound].addr);
+        require(!members[currentRound].hasReceived, "Already paid");
+
+        recipient.transfer(totalContributed);
+        members[currentRound].hasReceived = true;
+
+        // Reset for next round
+        totalContributed = 0;
+        for (uint i = 0; i < members.length; i++) {
+            contributions[members[i].addr] = 0;
+        }
+
+        currentRound++;
+        lastPayoutTime = block.timestamp;
+    }
+
     
 }
