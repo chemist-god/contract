@@ -63,5 +63,14 @@ contract SUSURotationalFund {
         lastPayoutTime = block.timestamp;
     }
 
-    
+    function getMembers() public view returns (Member[] memory) {
+        return members;
+    }
+
+    function getCurrentRecipient() public view returns (address) {
+        if (members.length > currentRound) {
+            return members[currentRound].addr;
+        }
+        return address(0);
+    }
 }
