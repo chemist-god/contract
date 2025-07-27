@@ -30,5 +30,18 @@ contract SUSURotationalFund {
         _;
     }
 
+    function joinSUSU() external {
+        require(members.length < 10, "Max group size reached");
+        require(contributions[msg.sender] == 0, "Already joined");
+        members.push(Member(msg.sender, false));
+    }
+
+    function contribute() external payable {
+        require(msg.value == contributionAmount, "Incorrect amount");
+        require(contributions[msg.sender] == 0, "Already contributed");
+        contributions[msg.sender] = msg.value;
+        totalContributed += msg.value;
+    }
+
     
 }
