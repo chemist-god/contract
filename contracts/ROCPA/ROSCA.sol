@@ -16,4 +16,25 @@ contract SusuROSCA {
         contributionAmount = _contributionAmount;
         totalRounds = _members.length;
     }
+
+    function contribute() external payable {
+        require(msg.value == contributionAmount, "Incorrect amount");
+        require(!hasReceived[msg.sender], "Already received payout");
+        contributions[msg.sender] += msg.value;
+    }
+
+    function distributeRound() external {
+        require(currentRound < totalRounds, "All rounds completed");
+        require(address(this).balance >= contributionAmount * members.length, "Not enough funds");
+
+        address recipient = members[currentRound];
+        payable(recipient).transfer(contributionAmount * members.length);
+        
+        hasReceived[recipient] = true;
+        currentRound++;
+    }
+
+    function getBalance() external view returns (uint) {
+        return address(this).balance;
+    }
 }
