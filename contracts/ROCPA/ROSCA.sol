@@ -41,7 +41,18 @@ contract SusuROSCA {
     }
     function contribute() external payable {
     require(!hasReceived[msg.sender], "Already received payout");
-    
+    // Check if late (after round deadline)
+    if (block.timestamp > roundDeadline) {
+        uint lateFee = (contributionAmount * 10) / 100; // 10% fee
+        require(msg.value == contributionAmount + lateFee, "Pay late fee");
+    } else {
+        require(msg.value == contributionAmount, "Incorrect amount");
+    }
+
+    contributions[msg.sender] += msg.value;
+    lastContributionTime[msg.sender] = block.timestamp;
+}
+
     function getBalance() external view returns (uint) {
         return address(this).balance;
     }
