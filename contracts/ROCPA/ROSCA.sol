@@ -11,6 +11,7 @@ contract SusuROSCA {
     mapping(uint => address) public roundToRecipient;
     mapping(address => bool) public hasReceived;
     mapping(address => uint) public contributions;
+   mapping(address => uint) public lastContributionTime;
 
     constructor(address[] memory _members, uint _contributionAmount) {
         require(_members.length > 1, "Need at least 2 members");
@@ -38,7 +39,9 @@ contract SusuROSCA {
         currentRound++;
         roundDeadline = block.timestamp + roundDuration; // New: Reset deadline for next round
     }
-
+    function contribute() external payable {
+    require(!hasReceived[msg.sender], "Already received payout");
+    
     function getBalance() external view returns (uint) {
         return address(this).balance;
     }
