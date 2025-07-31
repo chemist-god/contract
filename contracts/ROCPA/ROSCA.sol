@@ -18,6 +18,10 @@ contract SusuROSCA {
     uint public emergencyVoteCount;
     uint public minContributorsPerRound;
 
+    event ContributionMade(address member, uint amount, uint round);
+    event DistributionMade(address recipient, uint amount, uint round);
+    event EmergencyExecuted(address recipient, uint amount);
+
     constructor(address[] memory _members, uint _contributionAmount) {
         require(_members.length > 1, "Need at least 2 members");
         members = _members;
