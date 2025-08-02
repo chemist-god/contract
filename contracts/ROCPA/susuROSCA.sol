@@ -50,5 +50,30 @@ contract SusuROSCA is ReentrancyGuard {
     event ExtensionProposed(uint additionalDays);
     event ExtensionApproved(uint newDeadline);
 
-       }
+    constructor(address[] memory _members, uint _contributionAmount) {
+        require(_members.length > 1, "Need at least 2 members");
+        require(_contributionAmount > 0, "Contribution must be positive");
+        
+        members = _members;
+        contributionAmount = _contributionAmount;
+        totalRounds = _members.length;
+        roundDeadline = block.timestamp + roundDuration;
+        minContributorsPerRound = (_members.length * 2) / 3;
+        admin = msg.sender;
+        
+        for (uint i = 0; i < _members.length; i++) {
+            require(_members[i] != address(0), "Invalid member address");
+            require(!isMember[_members[i]], "Duplicate member");
+            
+            isMember[_members[i]] = true;
+            roundToRecipient[i] = _members[i];
+        }
+    }
+
+    modifier onlyMember() {
+        require(isMember[msg.sender], "Not a member");
+        _;
+    }
+
+   
 }
