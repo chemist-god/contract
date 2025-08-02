@@ -25,4 +25,30 @@ contract SusuROSCA is ReentrancyGuard {
     mapping(address => bool) public extensionVotes;
     mapping(uint => address) public roundToRecipient;
     
+    // Structs
+    struct Contribution {
+        uint amount;
+        uint timestamp;
+        bool isLate;
+    }
     
+    mapping(uint => mapping(address => Contribution)) public contributionDetails;
+
+    // Counters
+    uint public emergencyVoteCount;
+    uint public extensionVoteCount;
+    uint public minContributorsPerRound;
+    uint public proposedExtension;
+
+    // Events
+    event ContributionMade(address indexed member, uint amount, uint round, bool isLate);
+    event DistributionMade(address indexed recipient, uint amount, uint round);
+    event EmergencyVoted(address indexed member);
+    event EmergencyExecuted(address indexed recipient, uint amount);
+    event RoundAdvanced(uint newRound, uint newDeadline);
+    event MemberReplaced(address oldMember, address newMember);
+    event ExtensionProposed(uint additionalDays);
+    event ExtensionApproved(uint newDeadline);
+
+       }
+}
