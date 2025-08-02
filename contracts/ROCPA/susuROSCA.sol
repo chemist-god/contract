@@ -75,5 +75,34 @@ contract SusuROSCA is ReentrancyGuard {
         _;
     }
 
+    function contribute() external payable onlyMember nonReentrant {
+        require(!hasReceived[msg.sender], "Already received payout");
+        require(msg.sender != roundToRecipient[currentRound], "Recipient cannot contribute");
+        require(msg.value > 0, "Must send some value");
+        
+        bool isLate = block.timestamp > roundDeadline;
+        uint requiredAmount = isLate ? 
+            contributionAmount + (contributionAmount * 10) / 100 : 
+            contributionAmount;
+            
+        require(msg.value == requiredAmount, "Incorrect amount");
+
+        roundContributions[currentRound][msg.sender] = true;
+        contributions[msg.sender] += msg.value;
+        lastContributionTime[msg.sender] = block.timestamp;
+        
+        contributionDetails[currentRound][msg.sender] = Contribution({
+            amount: msg.value,
+            timestamp: block.timestamp,
+            isLate: isLate
+        });
+        
+        emit ContributionMade(msg.sender, msg.value, currentRound, isLate);
+        
+        // Check if we can auto-advance
+        if (isRoundReady()) {
+            distributeRound();
+        }
+    }
+
    
-}
