@@ -177,5 +177,18 @@ contract SusuROSCA is ReentrancyGuard {
         emit ExtensionProposed(additionalDays);
     }
 
+    function voteForExtension() external onlyMember {
+        require(proposedExtension > 0, "No extension proposed");
+        require(!extensionVotes[msg.sender], "Already voted");
+        extensionVotes[msg.sender] = true;
+        extensionVoteCount++;
+        
+        if (extensionVoteCount > members.length / 2) {
+            roundDeadline += proposedExtension;
+            emit ExtensionApproved(roundDeadline);
+            proposedExtension = 0;
+        }
+    }
+
     
 }
