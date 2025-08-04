@@ -168,5 +168,14 @@ contract SusuROSCA is ReentrancyGuard {
         emit EmergencyExecuted(recipient, contractBalance);
     }
 
+    function proposeExtension(uint additionalDays) external onlyMember {
+        require(additionalDays <= 7, "Max 7 day extension");
+        require(block.timestamp > roundDeadline - 1 days, "Too early to propose");
+        proposedExtension = additionalDays;
+        extensionVoteCount = 0;
+        
+        emit ExtensionProposed(additionalDays);
+    }
+
     
 }
