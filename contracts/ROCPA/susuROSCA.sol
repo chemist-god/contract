@@ -150,5 +150,23 @@ contract SusuROSCA is ReentrancyGuard {
         }
     }
 
+    function executeEmergency(address recipient) internal {
+        require(isMember[recipient], "Recipient must be a member");
+        require(currentRound < totalRounds, "Already completed");
+        
+        uint contractBalance = address(this).balance;
+        currentRound = totalRounds;
+        
+        // Clear all votes
+        for (uint i = 0; i < members.length; i++) {
+            emergencyVotes[members[i]] = false;
+            extensionVotes[members[i]] = false;
+        }
+        
+        payable(recipient).transfer(contractBalance);
+        
+        emit EmergencyExecuted(recipient, contractBalance);
+    }
+
     
 }
