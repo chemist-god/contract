@@ -105,4 +105,38 @@ contract SusuROSCA is ReentrancyGuard {
         }
     }
 
+    function distributeRound() public nonReentrant {
+        require(currentRound < totalRounds, "All rounds completed");
+        require(block.timestamp >= roundDeadline, "Round not yet ended");
+        require(block.timestamp <= roundDeadline + gracePeriod, "Grace period expired");
+        
+        uint contributorsCount = getContributorsForCurrentRound();
+        require(contributorsCount >= minContributorsPerRound, "Not enough contributors");
+        
+        address recipient = roundToRecipient[currentRound];
+        uint payoutAmount = contributionAmount * contributorsCount;
+        require(address(this).balance >= payoutAmount, "Not enough funds");
+
+        // State updates before transfer
+        hasReceived[recipient] = true;
+        currentRound++;
+        roundDeadline = block.timestamp + roundDuration;
+        
+        // Reset all votes
+        emergencyVoteCount = 0;
+        extensionVoteCount = 0;
+        proposedExtension = 0;
+        
+        for (uint i = 0; i < members.length; i++) {
+            emergencyVotes[members[i]] = false;
+            extensionVotes[members[i]] = false;
+        }
+
+        payable(recipient).transfer(payoutAmount);
+        
+        emit DistributionMade(recipient, payoutAmount, currentRound - 1);
+        emit RoundAdvanced(currentRound, roundDeadline);
+    }
+
    
+}
