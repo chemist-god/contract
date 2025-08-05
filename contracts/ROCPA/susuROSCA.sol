@@ -190,5 +190,33 @@ contract SusuROSCA is ReentrancyGuard {
         }
     }
 
+    function replaceMember(address oldMember, address newMember) external onlyMember {
+        require(isMember[oldMember], "Old member not found");
+        require(!isMember[newMember], "New member already exists");
+        require(newMember != address(0), "Invalid new member");
+        
+        // Update members array
+        for (uint i = 0; i < members.length; i++) {
+            if (members[i] == oldMember) {
+                members[i] = newMember;
+                break;
+            }
+        }
+        
+        // Update mappings
+        isMember[oldMember] = false;
+        isMember[newMember] = true;
+        
+        // Update recipient mapping for future rounds
+        for (uint i = currentRound; i < totalRounds; i++) {
+            if (roundToRecipient[i] == oldMember) {
+                roundToRecipient[i] = newMember;
+            }
+        }
+        
+        emit MemberReplaced(oldMember, newMember);
+    }
+
+    // View Functions
     
 }
