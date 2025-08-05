@@ -222,5 +222,15 @@ contract SusuROSCA is ReentrancyGuard {
         return address(this).balance;
     }
 
+    function getContributorsForCurrentRound() public view returns (uint) {
+        uint count;
+        for (uint i = 0; i < members.length; i++) {
+            if (roundContributions[currentRound][members[i]]) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     
 }
