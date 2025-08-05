@@ -232,5 +232,11 @@ contract SusuROSCA is ReentrancyGuard {
         return count;
     }
 
+    function isRoundReady() public view returns (bool) {
+        return block.timestamp >= roundDeadline && 
+               block.timestamp <= roundDeadline + gracePeriod &&
+               getContributorsForCurrentRound() >= minContributorsPerRound;
+    }
+
     
 }
