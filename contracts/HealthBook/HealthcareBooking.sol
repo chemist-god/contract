@@ -63,5 +63,11 @@ contract HealthcareBooking {
         emit StatusUpdated(_patient, _newStatus);
     }
 
-    
+    function getAppointments(uint256 _date) public view returns (Patient[] memory) {
+        return appointmentsByDate[_date];
+    }
+
+    function getPatientStatus(address _patient) public view returns (Status) {
+        return patientRecords[_patient].status;
+    }
 }
