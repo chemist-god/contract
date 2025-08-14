@@ -58,5 +58,10 @@ contract HealthcareBooking {
         emit AppointmentBooked(msg.sender, _appointmentDate);
     }
 
+    function updateStatus(address _patient, Status _newStatus) public onlyAdmin {
+        patientRecords[_patient].status = _newStatus;
+        emit StatusUpdated(_patient, _newStatus);
+    }
+
     
 }
