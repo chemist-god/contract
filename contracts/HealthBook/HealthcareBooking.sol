@@ -23,4 +23,16 @@ contract HealthcareBooking {
     event AppointmentBooked(address indexed patient, uint256 date);
     event StatusUpdated(address indexed patient, Status newStatus);
 
-   }
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Not authorized");
+        _;
+    }
+
+    constructor(uint256 _bookingWindow, uint256 _checkInWindow) {
+        admin = msg.sender;
+        bookingWindow = _bookingWindow;
+        checkInWindow = _checkInWindow;
+    }
+
+    
+}
