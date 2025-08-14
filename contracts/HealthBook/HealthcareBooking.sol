@@ -34,5 +34,29 @@ contract HealthcareBooking {
         checkInWindow = _checkInWindow;
     }
 
+    function bookAppointment(
+        string memory _name,
+        uint256 _severityScore,
+        uint256 _priorityRank,
+        string memory _contactMethod,
+        uint256 _appointmentDate
+    ) public {
+        require(block.timestamp < bookingWindow, "Booking window closed");
+
+        Patient memory newPatient = Patient({
+            name: _name,
+            severityScore: _severityScore,
+            priorityRank: _priorityRank,
+            contactMethod: _contactMethod,
+            status: Status.Pending,
+            appointmentDate: _appointmentDate
+        });
+
+        appointmentsByDate[_appointmentDate].push(newPatient);
+        patientRecords[msg.sender] = newPatient;
+
+        emit AppointmentBooked(msg.sender, _appointmentDate);
+    }
+
     
 }
