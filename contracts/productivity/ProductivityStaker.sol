@@ -25,4 +25,14 @@ contract ProductivityStaker {
         _;
     }
 
+    // Stake funds to activate productivity mode
+    function stake(uint256 amount) external payable {
+        require(msg.value == amount, "Incorrect ETH sent");
+        require(amount > 0, "Stake must be positive");
+
+        stakes[msg.sender] += amount;
+        totalStaked += amount;
     }
+
+    
+}
