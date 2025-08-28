@@ -69,5 +69,10 @@ contract ProductivityStaker {
         // Option: redirect to savingsPool, burn, or charity
     }
 
+    // View active tasks
+    function getTasks() external view returns (Task[] memory) {
+        return tasks[msg.sender];
+    }
+
     
 }
