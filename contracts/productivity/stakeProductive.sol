@@ -99,5 +99,22 @@ contract ProductivityStaker {
         emit TaskCompleted(msg.sender, taskId, reward);
     }
 
+    // Apply penalty for missed task
+    function applyPenalty(uint256 taskId) external {
+        require(taskId < tasks[msg.sender].length, "Invalid taskId");
+        Task storage task = tasks[msg.sender][taskId];
+        require(!task.completed && !task.missed, "Task already completed/missed");
+        require(block.timestamp > task.deadline, "Deadline not passed");
+
+        task.missed = true;
+        missedTasks[msg.sender] += 1;
+
+        uint256 penalty = (stakes[msg.sender] * task.rewardWeight) / 100;
+        stakes[msg.sender] -= penalty;
+        totalStaked -= penalty;
+        emit TaskMissed(msg.sender, taskId, penalty);
+        // Option: redirect to savingsPool, burn, or charity
+    }
+
     
 }
