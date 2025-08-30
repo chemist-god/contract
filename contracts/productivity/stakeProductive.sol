@@ -44,4 +44,15 @@ contract ProductivityStaker {
         totalStaked += amount;
         emit Staked(msg.sender, amount);
     }
+
+    // Create a new task
+    function createTask(string memory description, uint256 deadline, uint256 rewardWeight) external {
+        require(deadline > block.timestamp, "Deadline must be in future");
+        require(rewardWeight > 0 && rewardWeight <= 100, "Invalid weight");
+
+        tasks[msg.sender].push(Task(description, deadline, rewardWeight, false, false));
+        emit TaskCreated(msg.sender, tasks[msg.sender].length - 1);
+    }
+
+    
 }
