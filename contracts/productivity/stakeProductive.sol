@@ -54,5 +54,17 @@ contract ProductivityStaker {
         emit TaskCreated(msg.sender, tasks[msg.sender].length - 1);
     }
 
-    
+    // Update a task
+    function updateTask(uint256 taskId, string memory description, uint256 deadline, uint256 rewardWeight) external {
+        require(taskId < tasks[msg.sender].length, "Invalid taskId");
+        Task storage task = tasks[msg.sender][taskId];
+        require(!task.completed && !task.missed, "Cannot update completed/missed task");
+
+        task.description = description;
+        task.deadline = deadline;
+        task.rewardWeight = rewardWeight;
+        emit TaskUpdated(msg.sender, taskId);
+    }
+
+   
 }
