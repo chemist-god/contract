@@ -81,5 +81,23 @@ contract ProductivityStaker {
         emit TaskDeleted(msg.sender, taskId);
     }
 
+    // Complete a task and earn rewards
+    function completeTask(uint256 taskId) external {
+        require(taskId < tasks[msg.sender].length, "Invalid taskId");
+        Task storage task = tasks[msg.sender][taskId];
+        require(!task.completed && !task.missed, "Already completed/missed");
+        require(block.timestamp <= task.deadline, "Deadline passed");
+
+        task.completed = true;
+        streaks[msg.sender] += 1;
+        completedTasks[msg.sender] += 1;
+
+        uint256 reward = (stakes[msg.sender] * task.rewardWeight) / 100;
+        payable(msg.sender).transfer(reward);
+        stakes[msg.sender] -= reward;
+        totalStaked -= reward;
+        emit TaskCompleted(msg.sender, taskId, reward);
+    }
+
     
 }
