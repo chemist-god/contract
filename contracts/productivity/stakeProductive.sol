@@ -66,5 +66,20 @@ contract ProductivityStaker {
         emit TaskUpdated(msg.sender, taskId);
     }
 
-   
+    // Delete a task
+    function deleteTask(uint256 taskId) external {
+        require(taskId < tasks[msg.sender].length, "Invalid taskId");
+        Task storage task = tasks[msg.sender][taskId];
+        require(!task.completed && !task.missed, "Cannot delete completed/missed task");
+
+        // Remove task by swapping with last and popping
+        uint256 lastIndex = tasks[msg.sender].length - 1;
+        if (taskId != lastIndex) {
+            tasks[msg.sender][taskId] = tasks[msg.sender][lastIndex];
+        }
+        tasks[msg.sender].pop();
+        emit TaskDeleted(msg.sender, taskId);
+    }
+
+    
 }
