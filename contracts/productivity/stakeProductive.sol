@@ -116,5 +116,15 @@ contract ProductivityStaker {
         // Option: redirect to savingsPool, burn, or charity
     }
 
+    // View active tasks
+    function getTasks() external view returns (Task[] memory) {
+        return tasks[msg.sender];
+    }
+
+    // Get staking info
+    function getStakingInfo() external view returns (uint256 staked, uint256 streak, uint256 completed, uint256 missed) {
+        return (stakes[msg.sender], streaks[msg.sender], completedTasks[msg.sender], missedTasks[msg.sender]);
+    }
+
     
 }
