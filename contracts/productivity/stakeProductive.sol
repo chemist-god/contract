@@ -126,5 +126,11 @@ contract ProductivityStaker {
         return (stakes[msg.sender], streaks[msg.sender], completedTasks[msg.sender], missedTasks[msg.sender]);
     }
 
-    
+    // Emergency withdrawal (owner only)
+    function emergencyWithdraw() external onlyOwner {
+        payable(owner).transfer(address(this).balance);
+    }
+
+    // Fallback to accept ETH
+    receive() external payable {}
 }
