@@ -41,5 +41,18 @@ contract FarmerVetting {
         farmers[_farmer].isEligible = _score >= 70; // Threshold for eligibility
     }
 
-    
+    function getFarmer(address _farmer) public view returns (
+        string memory name,
+        string memory location,
+        uint reputationScore,
+        bool isVetted,
+        bool isEligible
+    ) {
+        Farmer memory f = farmers[_farmer];
+        return (f.name, f.location, f.reputationScore, f.isVetted, f.isEligible);
+    }
+
+    function getAllFarmers() public view returns (address[] memory) {
+        return farmerList;
+    }
 }
