@@ -53,5 +53,40 @@ contract FarmerVetting {
         emit FarmerVetted(_farmer, _score, farmers[_farmer].isEligible);
     }
 
-    
+    function adjustReputation(address _farmer, int change) public onlyAdmin {
+        require(farmers[_farmer].isVetted, "Farmer not vetted");
+
+        int newScore = int(farmers[_farmer].reputationScore) + change;
+        uint finalScore = newScore < 0 ? 0 : uint(newScore);
+
+        farmers[_farmer].reputationScore = finalScore;
+        farmers[_farmer].isEligible = finalScore >= 70;
+
+        emit ReputationAdjusted(_farmer, change, finalScore);
+    }
+
+    function transferAdmin(address newAdmin) public onlyAdmin {
+        require(newAdmin != address(0), "Invalid address");
+        emit AdminTransferred(admin, newAdmin);
+        admin = newAdmin;
+    }
+
+    function getFarmer(address _farmer) public view returns (
+        string memory name,
+        string memory location,
+        uint reputationScore,
+        bool isVetted,
+        bool isEligible
+    ) {
+        Farmer memory f = farmers[_farmer];
+        return (f.name, f.location, f.reputationScore, f.isVetted, f.isEligible);
+    }
+
+    function getAllFarmers() public view returns (address[] memory) {
+        return farmerList;
+    }
+
+    function getFarmerCount() public view returns (uint) {
+        return farmerList.length;
+    }
 }
