@@ -29,4 +29,29 @@ contract FarmerVetting {
         admin = msg.sender;
     }
 
+    function registerFarmer(string memory _name, string memory _location) public {
+        require(bytes(farmers[msg.sender].name).length == 0, "Farmer already registered");
+
+        Farmer storage f = farmers[msg.sender];
+        f.name = _name;
+        f.location = _location;
+        f.reputationScore = 0;
+        f.isVetted = false;
+        f.isEligible = false;
+
+        farmerList.push(msg.sender);
+        emit FarmerRegistered(msg.sender, _name, _location);
     }
+
+    function vetFarmer(address _farmer, uint _score) public onlyAdmin {
+        require(bytes(farmers[_farmer].name).length > 0, "Farmer not registered");
+
+        farmers[_farmer].reputationScore = _score;
+        farmers[_farmer].isVetted = true;
+        farmers[_farmer].isEligible = _score >= 70;
+
+        emit FarmerVetted(_farmer, _score, farmers[_farmer].isEligible);
+    }
+
+    
+}
