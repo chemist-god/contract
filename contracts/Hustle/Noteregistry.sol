@@ -39,5 +39,21 @@ contract NoteRegistry {
         return notes.length;
     }
 
-    
+    function getNote(uint256 noteId) external view returns (
+        string memory title,
+        string memory contentCID,
+        string memory category,
+        uint256 timestamp,
+        address author
+    ) {
+        require(noteId < notes.length, "Invalid note ID");
+        Note storage note = notes[noteId];
+        return (
+            note.title,
+            note.contentCID,
+            note.category,
+            note.timestamp,
+            note.author
+        );
+    }
 }
