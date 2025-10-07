@@ -38,5 +38,14 @@ contract HealthRecordAccess {
     }
 
     // Optional: Function to revoke access early
-    
+    function revokeAccess(string calldata _recordPointer) external {
+        require(recordOwner[_recordPointer] == msg.sender, "Not the record owner");
+        grants[msg.sender][_recordPointer].revoked = true;
+    }
+
+    // Optional: Check if access is currently valid
+    function isAccessValid(address _patient, string calldata _recordPointer) external view returns (bool) {
+        AccessGrant memory grant = grants[_patient][_recordPointer];
+        return !grant.revoked && block.timestamp <= grant.validUntil;
+    }
 }
