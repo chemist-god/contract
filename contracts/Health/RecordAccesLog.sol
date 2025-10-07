@@ -18,4 +18,21 @@ contract RecordAccessLogger {
         uint256 timestamp
     );
 
+    // Log an access attempt to a patient's record
+    function logAccess(
+        address _patient,
+        address _requester,
+        string calldata _recordPointer,
+        bool _allowed
+    ) external onlyAuthorized {
+        emit RecordAccessAttempted(
+            _patient,
+            _requester,
+            _recordPointer,
+            _allowed,
+            block.timestamp
+        );
     }
+
+    
+}
