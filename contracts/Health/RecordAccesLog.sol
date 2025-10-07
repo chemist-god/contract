@@ -34,5 +34,9 @@ contract RecordAccessLogger {
         );
     }
 
-    
+    // Example authorization check (replace with your own logic)
+    function isAuthorized(address _caller) internal view returns (bool) {
+        // Implement actual access control logic here
+        return true;
+    }
 }
