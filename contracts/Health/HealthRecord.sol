@@ -11,5 +11,11 @@ contract HealthRecordRegistry {
         bool active;                // Flag to indicate if record is active
     }
 
-   
+    // Mapping: patient address => array of health records
+    mapping(address => HealthRecord[]) public records;
+
+    // Event emitted when a new health record is added
+    event HealthRecordAdded(address indexed patient, string ipfsCID, uint256 timestamp);
+
+    
 }
