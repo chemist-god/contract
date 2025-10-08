@@ -17,5 +17,23 @@ contract HealthRecordRegistry {
     // Event emitted when a new health record is added
     event HealthRecordAdded(address indexed patient, string ipfsCID, uint256 timestamp);
 
+    // Add a new health record for the sender
+    function addHealthRecord(
+        string calldata _ipfsCID,
+        string calldata _encryptionMethod,
+        string calldata _keyAccessPointer
+    ) external {
+        HealthRecord memory newRecord = HealthRecord({
+            ipfsCID: _ipfsCID,
+            encryptionMethod: _encryptionMethod,
+            keyAccessPointer: _keyAccessPointer,
+            createdAt: block.timestamp,
+            active: true
+        });
+
+        records[msg.sender].push(newRecord);
+        emit HealthRecordAdded(msg.sender, _ipfsCID, block.timestamp);
+    }
+
     
 }
