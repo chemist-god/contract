@@ -41,5 +41,22 @@ contract HealthRecordRegistry {
         records[msg.sender][index].active = false;
     }
 
-    
+    // Optional: Retrieve active records only
+    function getActiveRecords(address _patient) external view returns (HealthRecord[] memory) {
+        uint256 count;
+        for (uint256 i = 0; i < records[_patient].length; i++) {
+            if (records[_patient][i].active) count++;
+        }
+
+        HealthRecord[] memory activeRecords = new HealthRecord[](count);
+        uint256 j;
+        for (uint256 i = 0; i < records[_patient].length; i++) {
+            if (records[_patient][i].active) {
+                activeRecords[j] = records[_patient][i];
+                j++;
+            }
+        }
+
+        return activeRecords;
+    }
 }
