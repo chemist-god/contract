@@ -35,5 +35,11 @@ contract HealthRecordRegistry {
         emit HealthRecordAdded(msg.sender, _ipfsCID, block.timestamp);
     }
 
+    // Optional: Deactivate a record (e.g., if outdated or revoked)
+    function deactivateRecord(uint256 index) external {
+        require(index < records[msg.sender].length, "Invalid index");
+        records[msg.sender][index].active = false;
+    }
+
     
 }
