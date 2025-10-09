@@ -88,5 +88,15 @@ contract RecordAccessControl {
         );
     }
 
+    /// @notice Registers a DID for a given address
+    function registerDID(address _addr, string calldata _did) external {
+        require(bytes(didToAddress[_addr]).length == 0, "DID already set");
+
+        didToAddress[_addr] = _did;
+        addressToDID[_did] = _addr;
+
+        emit DIDRegistered(_addr, _did);
+    }
+
     
 }
