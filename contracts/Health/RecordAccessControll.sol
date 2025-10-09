@@ -52,5 +52,25 @@ contract RecordAccessControl {
         _;
     }
 
+    // -------------------- Core Functions --------------------
+
+    /// @notice Grants access to a record for a specific duration
+    function grantAccess(
+        address _grantee,
+        string calldata _recordPointer,
+        uint256 _durationDays
+    ) external {
+        require(msg.sender == recordOwner[_recordPointer], "Not owner");
+
+        grants[msg.sender][_recordPointer] = AccessGrant({
+            grantee: _grantee,
+            recordPointer: _recordPointer,
+            validUntil: block.timestamp + (_durationDays * 1 days),
+            revoked: false
+        });
+
+        emit AccessGranted(msg.sender, _grantee, _recordPointer);
+    }
+
     
 }
