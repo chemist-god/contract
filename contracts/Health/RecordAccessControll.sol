@@ -45,5 +45,12 @@ contract RecordAccessControl {
         string did
     );
 
+    // -------------------- Modifiers --------------------
+
+    modifier onlyAuthorized() {
+        require(isAuthorized(msg.sender), "Not authorized");
+        _;
+    }
+
     
 }
