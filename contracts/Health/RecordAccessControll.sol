@@ -12,5 +12,17 @@ contract RecordAccessControl {
         bool revoked;            // Can be revoked early
     }
 
+    // -------------------- State Variables --------------------
+
+    // Mapping: patient address => recordPointer => AccessGrant
+    mapping(address => mapping(string => AccessGrant)) public grants;
+
+    // Mapping: recordPointer => owner address
+    mapping(string => address) public recordOwner;
+
+    // DID registry: address ↔ DID
+    mapping(address => string) public didToAddress;
+    mapping(string => address) public addressToDID;
+
     
 }
