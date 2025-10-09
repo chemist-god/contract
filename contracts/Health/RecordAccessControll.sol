@@ -72,5 +72,21 @@ contract RecordAccessControl {
         emit AccessGranted(msg.sender, _grantee, _recordPointer);
     }
 
+    /// @notice Logs an access attempt to a record
+    function logAccess(
+        address _patient,
+        address _requester,
+        string calldata _recordPointer,
+        bool _allowed
+    ) external onlyAuthorized {
+        emit RecordAccessAttempted(
+            _patient,
+            _requester,
+            _recordPointer,
+            _allowed,
+            block.timestamp
+        );
+    }
+
     
 }
