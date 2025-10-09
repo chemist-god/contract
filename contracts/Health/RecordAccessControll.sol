@@ -24,5 +24,26 @@ contract RecordAccessControl {
     mapping(address => string) public didToAddress;
     mapping(string => address) public addressToDID;
 
+    // -------------------- Events --------------------
+
+    event AccessGranted(
+        address indexed patient,
+        address indexed grantee,
+        string recordPointer
+    );
+
+    event RecordAccessAttempted(
+        address indexed patient,
+        address indexed requester,
+        string recordPointer,
+        bool allowed,
+        uint256 timestamp
+    );
+
+    event DIDRegistered(
+        address indexed user,
+        string did
+    );
+
     
 }
