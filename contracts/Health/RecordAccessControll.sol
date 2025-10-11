@@ -101,7 +101,7 @@ contract RecordAccessControl {
     // -------------------- Internal Logic --------------------
 
     /// @notice Placeholder for access control logic
-    function isAuthorized(address _caller) internal view returns (bool) {
+    function isAuthorized(address /* _caller */) internal pure returns (bool) {
         // Implement actual logic (e.g., role-based, staking-based, DID verification)
         return true;
     }
