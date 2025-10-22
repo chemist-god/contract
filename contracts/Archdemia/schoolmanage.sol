@@ -48,5 +48,14 @@ contract SchoolManagement {
         users[userAddr] = User(name, role, true);
     }
 
+    function createCourse(string memory title, uint256 capacity) public onlyTeacher {
+        courseCount++;
+        Course storage c = courses[courseCount];
+        c.title = title;
+        c.teacher = msg.sender;
+        c.capacity = capacity;
+        c.enrolledCount = 0;
+    }
+
     
 }
