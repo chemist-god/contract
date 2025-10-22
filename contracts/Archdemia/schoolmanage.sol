@@ -24,5 +24,24 @@ contract SchoolManagement {
     mapping(uint256 => Course) public courses;
     uint256 public courseCount;
 
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Not authorized");
+        _;
+    }
+
+    modifier onlyTeacher() {
+        require(users[msg.sender].role == Role.Teacher, "Only teachers allowed");
+        _;
+    }
+
+    modifier onlyStudent() {
+        require(users[msg.sender].role == Role.Student, "Only students allowed");
+        _;
+    }
+
+    constructor() {
+        admin = msg.sender;
+    }
+
     
 }
