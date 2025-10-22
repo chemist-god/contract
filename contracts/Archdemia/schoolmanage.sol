@@ -57,5 +57,17 @@ contract SchoolManagement {
         c.enrolledCount = 0;
     }
 
-    
+    function enrollInCourse(uint256 courseId) public onlyStudent {
+        Course storage c = courses[courseId];
+        require(c.enrolledCount < c.capacity, "Course full");
+        require(!c.enrolledStudents[msg.sender], "Already enrolled");
+
+        c.enrolledStudents[msg.sender] = true;
+        c.enrolledCount++;
+    }
+
+    function getCourse(uint256 courseId) public view returns (string memory, address, uint256, uint256) {
+        Course storage c = courses[courseId];
+        return (c.title, c.teacher, c.capacity, c.enrolledCount);
+    }
 }
