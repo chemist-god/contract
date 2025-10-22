@@ -43,5 +43,10 @@ contract SchoolManagement {
         admin = msg.sender;
     }
 
+    function registerUser(address userAddr, string memory name, Role role) public onlyAdmin {
+        require(!users[userAddr].registered, "Already registered");
+        users[userAddr] = User(name, role, true);
+    }
+
     
 }
