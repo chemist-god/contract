@@ -27,6 +27,9 @@ contract SchoolManagement {
     // Attendance: courseId => date => student => present
     mapping(uint256 => mapping(string => mapping(address => bool))) public attendance;
 
+    // Grades: courseId => student => grade
+    mapping(uint256 => mapping(address => string)) public grades;
+
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not authorized");
         _;
@@ -80,6 +83,16 @@ contract SchoolManagement {
     function getAttendance(uint256 courseId, string memory date) public view onlyStudent returns (bool) {
         return attendance[courseId][date][msg.sender];
     }
+
+    function recordGrade(uint256 courseId, address student, string memory grade) public onlyTeacher {
+        Course storage c = courses[courseId];
+        require(c.teacher == msg.sender, "Not your course");
+        require(c.enrolledStudents[student], "Student not enrolled");
+
+        grades[courseId][student] = grade;
+    }
+
+    
 
     function getCourse(uint256 courseId) public view returns (string memory, address, uint256, uint256) {
         Course storage c = courses[courseId];
