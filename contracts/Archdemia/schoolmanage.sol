@@ -92,7 +92,26 @@ contract SchoolManagement {
         grades[courseId][student] = grade;
     }
 
-    
+    function getTranscript() public view onlyStudent returns (string[] memory titles, string[] memory gradeList) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= courseCount; i++) {
+            if (courses[i].enrolledStudents[msg.sender]) {
+                count++;
+            }
+        }
+
+        titles = new string[](count);
+        gradeList = new string[](count);
+        uint256 index = 0;
+
+        for (uint256 i = 1; i <= courseCount; i++) {
+            if (courses[i].enrolledStudents[msg.sender]) {
+                titles[index] = courses[i].title;
+                gradeList[index] = grades[i][msg.sender];
+                index++;
+            }
+        }
+    }
 
     function getCourse(uint256 courseId) public view returns (string memory, address, uint256, uint256) {
         Course storage c = courses[courseId];
