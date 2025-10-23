@@ -77,6 +77,10 @@ contract SchoolManagement {
         attendance[courseId][date][student] = true;
     }
 
+    function getAttendance(uint256 courseId, string memory date) public view onlyStudent returns (bool) {
+        return attendance[courseId][date][msg.sender];
+    }
+
     function getCourse(uint256 courseId) public view returns (string memory, address, uint256, uint256) {
         Course storage c = courses[courseId];
         return (c.title, c.teacher, c.capacity, c.enrolledCount);
