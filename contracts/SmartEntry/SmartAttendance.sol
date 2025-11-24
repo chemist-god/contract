@@ -176,5 +176,41 @@ contract SmartAttendance {
         return id;
     }
 
-    
+    // --- Verifier registry ---
+    function registerVerifier(address verifier) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(verifier != address(0), "verifier zero");
+        _roles[VERIFIER_ROLE][verifier] = true;
+        emit VerifierRegistered(verifier, msg.sender);
+        emit RoleGranted(VERIFIER_ROLE, verifier, msg.sender);
+    }
+
+    function unregisterVerifier(address verifier) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _roles[VERIFIER_ROLE][verifier] = false;
+        emit VerifierUnregistered(verifier, msg.sender);
+        emit RoleRevoked(VERIFIER_ROLE, verifier, msg.sender);
+    }
+
+    // --- EIP-712 typed data hashing helper ---
+    function _hashAttendancePayload(
+        uint256 orgId,
+        uint256 eventId,
+        bytes32 userHash,
+        string memory ipfsCid,
+        uint256 timestamp,
+        uint256 nonce
+    ) internal pure returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                ATTENDANCE_TYPEHASH,
+                orgId,
+                eventId,
+                userHash,
+                keccak256(bytes(ipfsCid)),
+                timestamp,
+                nonce
+            )
+        );
+    }
+
+   
 }
