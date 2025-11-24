@@ -240,5 +240,48 @@ contract SmartAttendance {
         return signer;
     }
 
-    
+    // --- Record attendance by signature (verifier signs) ---
+    // Off-chain the verifier signs the typed payload:
+    // AttendancePayload(orgId, eventId, userHash, ipfsCid, timestamp, nonce)
+    // Caller supplies signature and contract verifies signer has VERIFIER_ROLE and nonce is correct.
+    function recordAttendanceBySignature(
+        uint256 orgId,
+        uint256 eventId,
+        bytes32 userHash,
+        string calldata ipfsCid,
+        uint256 timestamp,
+        uint256 nonce,
+        bytes calldata signature
+    ) external returns (uint256) {
+        require(orgs[orgId].exists, "org missing");
+        require(events[eventId].exists, "event missing");
+        // hash payload and domain
+        bytes32 structHash = _hashAttendancePayload(orgId, eventId, userHash, ipfsCid, timestamp, nonce);
+        bytes32 digest = _toTypedDigest(structHash);
+
+        address signer = _recoverSigner(digest, signature);
+        require(hasRole(VERIFIER_ROLE, signer), "invalid signer (not verifier)");
+
+        // replay protection: require nonce == verifierNonce[signer] + 1
+        require(nonce == verifierNonce[signer] + 1, "bad nonce");
+        verifierNonce[signer] = nonce;
+
+        // create attendance
+        uint256 aid = _nextAttendanceId++;
+        attendances[aid] = Attendance({
+            id: aid,
+            orgId: orgId,
+            eventId: eventId,
+            userHash: userHash,
+            ipfsCid: ipfsCid,
+            timestamp: timestamp,
+            verifier: signer,
+            status: AttendanceStatus.Confirmed
+        });
+
+        emit AttendanceRecorded(aid, eventId, userHash, signer);
+        return aid;
+    }
+
+   
 }
