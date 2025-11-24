@@ -57,5 +57,51 @@ contract SmartAttendance {
         AttendanceStatus status;
     }
 
-    
+    // storage
+    mapping(uint256 => Org) public orgs;
+    mapping(uint256 => EventStruct) public events;
+    mapping(uint256 => Attendance) public attendances;
+
+    // verifier => latest nonce (we require incoming nonce == stored + 1)
+    mapping(address => uint256) public verifierNonce;
+
+    // --- Events ---
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+    event OrgCreated(uint256 indexed orgId, address indexed admin);
+    event EventCreated(uint256 indexed eventId, uint256 indexed orgId, string name);
+    event VerifierRegistered(address indexed verifier, address indexed by);
+    event VerifierUnregistered(address indexed verifier, address indexed by);
+    event AttendanceRecorded(uint256 indexed attendanceId, uint256 indexed eventId, bytes32 userHash, address verifier);
+    event AttendanceStatusChanged(uint256 indexed attendanceId, AttendanceStatus status, address changedBy);
+
+    // --- Modifiers ---
+    modifier onlyRole(bytes32 role) {
+        require(hasRole(role, msg.sender), "SmartAttendance: missing role");
+        _;
+    }
+
+    // --- Constructor ---
+    constructor(string memory name, string memory version) {
+        deployer = msg.sender;
+        _roles[DEFAULT_ADMIN_ROLE][msg.sender] = true;
+        emit RoleGranted(DEFAULT_ADMIN_ROLE, msg.sender, msg.sender);
+
+        // compute DOMAIN_SEPARATOR (EIP-712 like)
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                keccak256(bytes(name)),
+                keccak256(bytes(version)),
+                chainId,
+                address(this)
+            )
+        );
+    }
+
+   
 }
