@@ -118,5 +118,30 @@ contract SmartAttendance {
         return _roles[role][account];
     }
 
+    // --- Organization management ---
+    function createOrg(address admin, bytes32 orgSalt) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256) {
+        require(admin != address(0), "admin zero");
+        uint256 id = _nextOrgId++;
+        orgs[id] = Org({
+            id: id,
+            admin: admin,
+            orgSalt: orgSalt,
+            exists: true
+        });
+        // grant org admin role to the admin address
+        _roles[ORG_ADMIN_ROLE][admin] = true;
+        emit RoleGranted(ORG_ADMIN_ROLE, admin, msg.sender);
+
+        emit OrgCreated(id, admin);
+        return id;
+    }
+
+    function updateOrgSalt(uint256 orgId, bytes32 newSalt) external {
+        require(orgs[orgId].exists, "org not exists");
+        address adminAddr = orgs[orgId].admin;
+        require(msg.sender == adminAddr || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "not authorized");
+        orgs[orgId].orgSalt = newSalt;
+    }
+
     
 }
