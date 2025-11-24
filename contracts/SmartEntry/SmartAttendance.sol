@@ -212,5 +212,33 @@ contract SmartAttendance {
         );
     }
 
-   
+    // --- Signature recovery (EIP-191 style digest) ---
+    function _toTypedDigest(bytes32 structHash) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+    }
+
+    // safe ecrecover handling (expects 65-byte signature)
+    function _recoverSigner(bytes32 digest, bytes memory signature) internal pure returns (address) {
+        require(signature.length == 65, "invalid sig len");
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            r := mload(add(signature, 32))
+            s := mload(add(signature, 64))
+            v := byte(0, mload(add(signature, 96)))
+        }
+        // EIP-2 still allows v to be 27 or 28
+        if (v < 27) {
+            v += 27;
+        }
+        require(v == 27 || v == 28, "invalid v");
+        // solhint-disable-next-line arg-overflow
+        address signer = ecrecover(digest, v, r, s);
+        require(signer != address(0), "zero signer");
+        return signer;
+    }
+
+    
 }
