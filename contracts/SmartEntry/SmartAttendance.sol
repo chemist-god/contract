@@ -283,5 +283,34 @@ contract SmartAttendance {
         return aid;
     }
 
-   
+    // --- Change attendance status (audit/dispute) ---
+    function changeAttendanceStatus(uint256 attendanceId, AttendanceStatus newStatus) external {
+        require(attendances[attendanceId].id != 0, "attendance not exist");
+        require(
+            hasRole(AUDITOR_ROLE, msg.sender) ||
+            hasRole(ORG_ADMIN_ROLE, msg.sender) ||
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "not authorized"
+        );
+        attendances[attendanceId].status = newStatus;
+        emit AttendanceStatusChanged(attendanceId, newStatus, msg.sender);
+    }
+
+    // --- Read helpers ---
+    function getAttendance(uint256 attendanceId) external view returns (Attendance memory) {
+        return attendances[attendanceId];
+    }
+
+    function getEvent(uint256 eventId) external view returns (EventStruct memory) {
+        return events[eventId];
+    }
+
+    function getOrg(uint256 orgId) external view returns (Org memory) {
+        return orgs[orgId];
+    }
+
+    // --- Utility: quick role check for off-chain convenience ---
+    function isVerifier(address account) external view returns (bool) {
+        return _roles[VERIFIER_ROLE][account];
+    }
 }
