@@ -103,5 +103,20 @@ contract SmartAttendance {
         );
     }
 
-   
+    // --- Role management (simple) ---
+    function grantRole(bytes32 role, address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _roles[role][account] = true;
+        emit RoleGranted(role, account, msg.sender);
+    }
+
+    function revokeRole(bytes32 role, address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _roles[role][account] = false;
+        emit RoleRevoked(role, account, msg.sender);
+    }
+
+    function hasRole(bytes32 role, address account) public view returns (bool) {
+        return _roles[role][account];
+    }
+
+    
 }
