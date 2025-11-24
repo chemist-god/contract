@@ -143,5 +143,38 @@ contract SmartAttendance {
         orgs[orgId].orgSalt = newSalt;
     }
 
+    // --- Event management ---
+    function createEvent(
+        uint256 orgId,
+        string calldata name,
+        uint256 startTimestamp,
+        uint256 endTimestamp,
+        string calldata ipfsMetaCid
+    ) external returns (uint256) {
+        require(orgs[orgId].exists, "org not exists");
+        // allow org admin, organizer, or default admin
+        require(
+            hasRole(ORG_ADMIN_ROLE, msg.sender) ||
+            hasRole(ORGANIZER_ROLE, msg.sender) ||
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "not authorized"
+        );
+
+        uint256 id = _nextEventId++;
+        events[id] = EventStruct({
+            id: id,
+            orgId: orgId,
+            name: name,
+            startTimestamp: startTimestamp,
+            endTimestamp: endTimestamp,
+            ipfsMetaCid: ipfsMetaCid,
+            creator: msg.sender,
+            exists: true
+        });
+
+        emit EventCreated(id, orgId, name);
+        return id;
+    }
+
     
 }
