@@ -23,5 +23,22 @@ contract SimplePay {
         emit Deposit(msg.sender, msg.value);
     }
 
+    /// @notice Withdraw Ether from your balance to your own address
+    /// @param amount Amount of wei to withdraw
+    function withdraw(uint256 amount) external {
+        require(amount > 0, "Zero amount");
+        uint256 bal = balances[msg.sender];
+        require(bal >= amount, "Insufficient balance");
+
+        // effects
+        balances[msg.sender] = bal - amount;
+
+        // interaction
+        (bool ok, ) = msg.sender.call{value: amount}("");
+        require(ok, "Withdraw failed");
+
+        emit Withdraw(msg.sender, amount);
+    }
+
     
 }
