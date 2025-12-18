@@ -15,5 +15,13 @@ contract SimplePay {
     // Emitted when someone sends Ether to another user via the contract
     event Payment(address indexed from, address indexed to, uint256 amount);
 
+    /// @notice Deposit Ether into your balance
+    /// @dev msg.value is the amount of wei sent with the call
+    function deposit() external payable {
+        require(msg.value > 0, "No Ether sent");
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
     
 }
