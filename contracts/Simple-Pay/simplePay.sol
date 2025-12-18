@@ -40,5 +40,22 @@ contract SimplePay {
         emit Withdraw(msg.sender, amount);
     }
 
+    /// @notice Send Ether from your balance to another address
+    /// @param to Recipient address
+    /// @param amount Amount of wei to send
+    function pay(address to, uint256 amount) external {
+        require(to != address(0), "Invalid recipient");
+        require(amount > 0, "Zero amount");
+
+        uint256 bal = balances[msg.sender];
+        require(bal >= amount, "Insufficient balance");
+
+        // effects
+        balances[msg.sender] = bal - amount;
+        balances[to] += amount;
+
+        emit Payment(msg.sender, to, amount);
+    }
+
     
 }
