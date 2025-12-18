@@ -57,5 +57,17 @@ contract SimplePay {
         emit Payment(msg.sender, to, amount);
     }
 
-    
+    /// @notice Allow contract to receive Ether sent directly
+    receive() external payable {
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    /// @notice Fallback for unknown calls, also accepts Ether
+    fallback() external payable {
+        if (msg.value > 0) {
+            balances[msg.sender] += msg.value;
+            emit Deposit(msg.sender, msg.value);
+        }
+    }
 }
