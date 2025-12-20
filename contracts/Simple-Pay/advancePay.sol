@@ -139,5 +139,18 @@ contract AdvancedPay {
         emit PaymentRefunded(id, p.payer, amount);
     }
 
-    
+    /// @notice Creator can cancel before any funds are deposited
+    function cancelPayment(uint256 id) external {
+        Payment storage p = payments[id];
+        require(p.amount > 0, "Payment does not exist");
+        require(
+            msg.sender == p.payer || msg.sender == p.payee,
+            "Only payer or payee"
+        );
+        require(p.deposited == 0, "Already funded");
+        require(p.status == PaymentStatus.Pending, "Not pending");
+
+        p.status = PaymentStatus.Cancelled;
+        emit PaymentCancelled(id);
+    }
 }
