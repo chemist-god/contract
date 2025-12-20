@@ -19,5 +19,39 @@ contract AdvancedPay {
         PaymentStatus status;
     }
 
-    
+    // Payment id => Payment info
+    mapping(uint256 => Payment) public payments;
+    uint256 public nextPaymentId;
+
+    event PaymentCreated(
+        uint256 indexed id,
+        address indexed payer,
+        address indexed payee,
+        uint256 amount
+    );
+
+    event PaymentFunded(
+        uint256 indexed id,
+        address indexed payer,
+        uint256 amount,
+        uint256 totalDeposited
+    );
+
+    event PaymentCompleted(
+        uint256 indexed id,
+        address indexed payee,
+        uint256 amount
+    );
+
+    event PaymentRefunded(
+        uint256 indexed id,
+        address indexed payer,
+        uint256 amount
+    );
+
+    event PaymentCancelled(
+        uint256 indexed id
+    );
+
+   
 }
