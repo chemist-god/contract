@@ -117,5 +117,27 @@ contract AdvancedPay {
         emit PaymentCompleted(id, p.payee, amount);
     }
 
-   
+    /// @notice Payer can refund funds if payment not completed
+    function refundPayment(uint256 id) external {
+        Payment storage p = payments[id];
+        require(p.amount > 0, "Payment does not exist");
+        require(
+            p.status == PaymentStatus.Pending || p.status == PaymentStatus.Funded,
+            "Cannot refund"
+        );
+        require(msg.sender == p.payer, "Only payer");
+
+        uint256 amount = p.deposited;
+        require(amount > 0, "Nothing to refund");
+
+        p.deposited = 0;
+        p.status = PaymentStatus.Refunded;
+
+        (bool ok, ) = p.payer.call{value: amount}("");
+        require(ok, "Refund failed");
+
+        emit PaymentRefunded(id, p.payer, amount);
+    }
+
+    
 }
