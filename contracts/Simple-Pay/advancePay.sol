@@ -99,5 +99,23 @@ contract AdvancedPay {
         emit PaymentFunded(id, msg.sender, msg.value, p.deposited);
     }
 
-    
+    /// @notice Payee pulls funds once payment is fully funded
+    /// @dev Pull‑payment pattern: payee withdraws instead of contract pushing.[web:36][web:42]
+    function claimPayment(uint256 id) external {
+        Payment storage p = payments[id];
+        require(p.amount > 0, "Payment does not exist");
+        require(p.status == PaymentStatus.Funded, "Not funded");
+        require(msg.sender == p.payee, "Only payee");
+
+        uint256 amount = p.deposited;
+        p.deposited = 0;
+        p.status = PaymentStatus.Completed;
+
+        (bool ok, ) = p.payee.call{value: amount}("");
+        require(ok, "Transfer failed");
+
+        emit PaymentCompleted(id, p.payee, amount);
+    }
+
+   
 }
