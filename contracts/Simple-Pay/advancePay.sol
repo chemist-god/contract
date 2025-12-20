@@ -53,5 +53,29 @@ contract AdvancedPay {
         uint256 indexed id
     );
 
-   
+    /// @notice Create a payment order between payer and payee
+    /// @dev Can be created by anyone (often the payer or payee)
+    function createPayment(
+        address payer,
+        address payee,
+        uint256 amount
+    ) external returns (uint256 id) {
+        require(payer != address(0), "Invalid payer");
+        require(payee != address(0), "Invalid payee");
+        require(amount > 0, "Amount must be > 0");
+        require(payer != payee, "Payer = payee");
+
+        id = nextPaymentId++;
+        payments[id] = Payment({
+            payer: payer,
+            payee: payee,
+            amount: amount,
+            deposited: 0,
+            status: PaymentStatus.Pending
+        });
+
+        emit PaymentCreated(id, payer, payee, amount);
+    }
+
+    
 }
