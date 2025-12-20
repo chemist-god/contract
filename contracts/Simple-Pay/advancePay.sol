@@ -77,5 +77,27 @@ contract AdvancedPay {
         emit PaymentCreated(id, payer, payee, amount);
     }
 
+    /// @notice Fund a payment order by sending Ether
+    /// @dev Only the designated payer can fund this payment
+    function fundPayment(uint256 id) external payable {
+        Payment storage p = payments[id];
+        require(p.amount > 0, "Payment does not exist");
+        require(
+            p.status == PaymentStatus.Pending || p.status == PaymentStatus.Funded,
+            "Not fundable"
+        );
+        require(msg.sender == p.payer, "Only payer");
+        require(msg.value > 0, "No Ether sent");
+        require(p.deposited + msg.value <= p.amount, "Too much Ether");
+
+        p.deposited += msg.value;
+
+        if (p.deposited == p.amount) {
+            p.status = PaymentStatus.Funded;
+        }
+
+        emit PaymentFunded(id, msg.sender, msg.value, p.deposited);
+    }
+
     
 }
