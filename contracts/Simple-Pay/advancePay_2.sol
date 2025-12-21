@@ -39,5 +39,34 @@ contract SubPay {
     // replay protection for meta-txs: subscriber => nonce
     mapping(address => uint256) public nonces;
 
+    // --- Events ---
+    event MerchantAdded(address indexed merchant);
+    event MerchantRemoved(address indexed merchant);
+    event PlanCreated(uint256 indexed planId, address indexed merchant, address token, uint256 amount, uint256 interval);
+    event PlanStatusChanged(uint256 indexed planId, bool active);
+    event Subscribed(uint256 indexed subId, uint256 indexed planId, address indexed subscriber, uint256 firstPaymentTime);
+    event Unsubscribed(uint256 indexed subId);
+    event PaymentExecuted(uint256 indexed subId, uint256 indexed planId, address indexed subscriber, uint256 amount, uint256 paidAt);
+    event RelayerSet(address indexed relayer, bool allowed);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    modifier onlyMerchant() {
+        require(isMerchant[msg.sender], "Not merchant");
+        _;
+    }
+
+    modifier onlyRelayer() {
+        require(isRelayer[msg.sender], "Not relayer");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
     
 }
