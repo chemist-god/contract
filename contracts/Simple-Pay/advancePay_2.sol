@@ -117,5 +117,59 @@ contract SubPay {
         emit PlanStatusChanged(planId, active);
     }
 
+    // --- Subscribe / unsubscribe ---
+
+    /// @notice Subscriber approves token to this contract before calling.
+    function subscribe(uint256 planId) external returns (uint256 subId) {
+        Plan storage p = plans[planId];
+        require(p.merchant != address(0), "Plan not found");
+        require(p.active, "Plan inactive");
+
+        // take first payment immediately
+        require(
+            p.token.transferFrom(msg.sender, p.merchant, p.amount),
+            "First payment failed"
+        );
+
+        subId = nextSubId++;
+        subs[subId] = Subscription({
+            planId: planId,
+            subscriber: msg.sender,
+            nextPaymentTime: block.timestamp + p.interval,
+            active: true
+        });
+
+        emit Subscribed(subId, planId, msg.sender, block.timestamp);
+        emit PaymentExecuted(subId, planId, msg.sender, p.amount, block.timestamp);
+    }
+
+    function unsubscribe(uint256 subId) external {
+        Subscription storage s = subs[subId];
+        require(s.active, "Not active");
+        require(msg.sender == s.subscriber, "Not subscriber");
+        s.active = false;
+        emit Unsubscribed(subId);
+    }
+
+    // --- Recurring payment execution (anyone can call) ---
+
+    function executePayment(uint256 subId) public {
+        Subscription storage s = subs[subId];
+        require(s.active, "Sub inactive");
+
+        Plan storage p = plans[s.planId];
+        require(p.active, "Plan inactive");
+        require(block.timestamp >= s.nextPaymentTime, "Too early");
+
+        s.nextPaymentTime = block.timestamp + p.interval;
+
+        require(
+            p.token.transferFrom(s.subscriber, p.merchant, p.amount),
+            "Payment failed"
+        );
+
+        emit PaymentExecuted(subId, s.planId, s.subscriber, p.amount, block.timestamp);
+    }
+
     
 }
