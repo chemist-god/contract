@@ -86,5 +86,36 @@ contract SubPay {
         emit RelayerSet(relayer, allowed);
     }
 
+    // --- Plan lifecycle ---
+
+    function createPlan(
+        IERC20 token,
+        uint256 amount,
+        uint256 interval
+    ) external onlyMerchant returns (uint256 planId) {
+        require(address(token) != address(0), "Token zero");
+        require(amount > 0, "Amount = 0");
+        require(interval >= 60, "Interval too small");
+
+        planId = nextPlanId++;
+        plans[planId] = Plan({
+            merchant: msg.sender,
+            token: token,
+            amount: amount,
+            interval: interval,
+            active: true
+        });
+
+        emit PlanCreated(planId, msg.sender, address(token), amount, interval);
+    }
+
+    function setPlanActive(uint256 planId, bool active) external {
+        Plan storage p = plans[planId];
+        require(p.merchant != address(0), "Plan not found");
+        require(msg.sender == p.merchant || msg.sender == owner, "Not authorized");
+        p.active = active;
+        emit PlanStatusChanged(planId, active);
+    }
+
     
 }
