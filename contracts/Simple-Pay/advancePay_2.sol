@@ -171,5 +171,43 @@ contract SubPay {
         emit PaymentExecuted(subId, s.planId, s.subscriber, p.amount, block.timestamp);
     }
 
-    
+    // --- Meta-transaction style payment execution ---
+    // Very simplified: subscriber signs off-chain, relayer calls this and pays gas.
+
+    function executePaymentWithSig(
+        uint256 subId,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external onlyRelayer {
+        require(block.timestamp <= deadline, "Signature expired");
+
+        Subscription storage sub = subs[subId];
+        require(sub.active, "Sub inactive");
+
+        uint256 nonce = nonces[sub.subscriber];
+
+        // EIP-191 style prefixed hash (for demo purposes; for production use EIP-712)[web:59][web:62][web:68]
+        bytes32 msgHash = keccak256(
+            abi.encodePacked(
+                address(this),
+                "EXECUTE_PAYMENT",
+                subId,
+                nonce,
+                deadline
+            )
+        );
+        bytes32 ethSignedHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", msgHash)
+        );
+
+        address signer = ecrecover(ethSignedHash, v, r, s);
+        require(signer == sub.subscriber, "Invalid signer");
+
+        nonces[sub.subscriber] = nonce + 1;
+
+        // Now perform the regular payment logic
+        executePayment(subId);
+    }
 }
