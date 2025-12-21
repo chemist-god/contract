@@ -68,5 +68,23 @@ contract SubPay {
         owner = msg.sender;
     }
 
+    // --- Role management ---
+
+    function addMerchant(address account) external onlyOwner {
+        require(account != address(0), "Zero address");
+        isMerchant[account] = true;
+        emit MerchantAdded(account);
+    }
+
+    function removeMerchant(address account) external onlyOwner {
+        isMerchant[account] = false;
+        emit MerchantRemoved(account);
+    }
+
+    function setRelayer(address relayer, bool allowed) external onlyOwner {
+        isRelayer[relayer] = allowed;
+        emit RelayerSet(relayer, allowed);
+    }
+
     
 }
