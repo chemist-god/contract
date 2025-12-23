@@ -60,5 +60,31 @@ contract RealEstateCrowdfund {
         emit Invested(msg.sender, msg.value);
     }
 
-   
+    // ----- FUNDING STATE MANAGEMENT -----
+
+    /// @notice Sponsor closes funding after deadline or once goal is reached.
+    function closeFunding() external onlySponsor {
+        require(!fundingClosed, "Already closed");
+        require(
+            block.timestamp > deadline || totalInvested >= fundingGoal,
+            "Too early to close"
+        );
+
+        fundingClosed = true;
+        goalReached = (totalInvested >= fundingGoal);
+
+        emit FundingClosed(goalReached, totalInvested);
+    }
+
+    /// @notice Sponsor withdraws raised capital if goal reached and funding closed.
+    function withdrawToSponsor(uint256 amount) external onlySponsor {
+        require(fundingClosed, "Funding not closed");
+        require(goalReached, "Goal not reached");
+        require(amount <= address(this).balance, "Insufficient balance");
+
+        (bool ok, ) = sponsor.call{value: amount}("");
+        require(ok, "Transfer failed");
+    }
+
+    
 }
