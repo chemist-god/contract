@@ -13,5 +13,36 @@ contract RealEstateCrowdfund {
 
     uint256 public totalInvested;    // Total amount invested
 
-    
+    mapping(address => uint256) public balances;  // investor => amount invested
+    address[] public investors;                   // list of investor addresses
+
+    event Invested(address indexed investor, uint256 amount);
+    event FundingClosed(bool goalReached, uint256 total);
+    event RefundClaimed(address indexed investor, uint256 amount);
+    event ReturnsDistributed(uint256 totalAmount);
+
+    modifier onlySponsor() {
+        require(msg.sender == sponsor, "Not sponsor");
+        _;
+    }
+
+    modifier fundingOpen() {
+        require(!fundingClosed, "Funding closed");
+        require(block.timestamp <= deadline, "Deadline passed");
+        _;
+    }
+
+    constructor(
+        string memory _projectName,
+        uint256 _fundingGoal,
+        uint256 _durationSeconds
+    ) {
+        require(_fundingGoal > 0, "Goal must be > 0");
+        sponsor = msg.sender;
+        projectName = _projectName;
+        fundingGoal = _fundingGoal;
+        deadline = block.timestamp + _durationSeconds;
+    }
+
+   
 }
