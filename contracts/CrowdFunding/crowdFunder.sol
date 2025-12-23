@@ -44,5 +44,21 @@ contract RealEstateCrowdfund {
         deadline = block.timestamp + _durationSeconds;
     }
 
+    // ----- INVESTMENT LOGIC -----
+
+    /// @notice Investors send ETH to participate in the project.
+    function invest() external payable fundingOpen {
+        require(msg.value > 0, "No ETH sent");
+
+        if (balances[msg.sender] == 0) {
+            investors.push(msg.sender);
+        }
+
+        balances[msg.sender] += msg.value;
+        totalInvested += msg.value;
+
+        emit Invested(msg.sender, msg.value);
+    }
+
    
 }
