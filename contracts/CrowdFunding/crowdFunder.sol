@@ -86,5 +86,56 @@ contract RealEstateCrowdfund {
         require(ok, "Transfer failed");
     }
 
-    
+    // ----- REFUND & RETURNS LOGIC -----
+
+    /// @notice Investors can claim refund if goal not reached after funding is closed.
+    function claimRefund() external {
+        require(fundingClosed, "Funding not closed");
+        require(!goalReached, "Goal was reached, no refunds");
+        uint256 amount = balances[msg.sender];
+        require(amount > 0, "Nothing to refund");
+
+        balances[msg.sender] = 0;
+        (bool ok, ) = msg.sender.call{value: amount}("");
+        require(ok, "Refund failed");
+
+        emit RefundClaimed(msg.sender, amount);
+    }
+
+    /// @notice Sponsor deposits ETH to distribute returns proportionally to each investor.
+    /// @dev Call this after the property generates profit (off-chain).
+    function distributeReturns() external payable onlySponsor {
+        require(goalReached, "Goal not reached");
+        require(fundingClosed, "Funding not closed");
+        require(msg.value > 0, "No ETH provided");
+
+        uint256 totalAmount = msg.value;
+        uint256 length = investors.length;
+
+        // Distribute proportionally to each investor according to share = balance / totalInvested
+        for (uint256 i = 0; i < length; i++) {
+            address investor = investors[i];
+            uint256 invested = balances[investor];
+            if (invested == 0) continue;
+
+            uint256 share = (totalAmount * invested) / totalInvested;
+            if (share > 0) {
+                (bool ok, ) = investor.call{value: share}("");
+                require(ok, "Return transfer failed");
+            }
+        }
+
+        emit ReturnsDistributed(totalAmount);
+    }
+
+    // ----- VIEW HELPERS -----
+
+    function getInvestors() external view returns (address[] memory) {
+        return investors;
+    }
+
+    function getInvestorShare(address investor) external view returns (uint256) {
+        if (totalInvested == 0) return 0;
+        return (balances[investor] * 1e18) / totalInvested; // scaled fraction
+    }
 }
