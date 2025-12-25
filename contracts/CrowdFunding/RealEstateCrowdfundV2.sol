@@ -94,5 +94,34 @@ contract RealEstateCrowdfundV2 {
         _;
     }
 
-   
+    // ----- PROJECT CREATION -----
+
+    function createProject(
+        string memory name,
+        string memory metadataURI,
+        uint256 fundingGoal,
+        uint256 minInvestment,
+        uint256 durationSeconds,
+        address sponsor
+    ) external onlyAdmin returns (uint256 projectId) {
+        require(fundingGoal > 0, "Goal must be > 0");
+        require(durationSeconds > 0, "Duration must be > 0");
+        require(minInvestment > 0, "Min investment > 0");
+        require(sponsor != address(0), "Sponsor required");
+
+        projectId = nextProjectId;
+        nextProjectId++;
+
+        Project storage p = projects[projectId];
+        p.name = name;
+        p.metadataURI = metadataURI;
+        p.sponsor = sponsor;
+        p.fundingGoal = fundingGoal;
+        p.minInvestment = minInvestment;
+        p.deadline = block.timestamp + durationSeconds;
+
+        emit ProjectCreated(projectId, name, sponsor, fundingGoal, p.deadline);
+    }
+
+    
 }
