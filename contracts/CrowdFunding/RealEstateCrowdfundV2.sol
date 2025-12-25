@@ -153,5 +153,37 @@ contract RealEstateCrowdfundV2 {
         emit Invested(projectId, msg.sender, amount, tokensToMint);
     }
 
+    // ----- FUNDING STATE -----
+
+    function closeFunding(uint256 projectId) external onlySponsor(projectId) {
+        Project storage p = projects[projectId];
+        require(!p.fundingClosed, "Already closed");
+        require(
+            block.timestamp > p.deadline || p.totalRaised >= p.fundingGoal,
+            "Too early to close"
+        );
+
+        p.fundingClosed = true;
+        p.goalReached = (p.totalRaised >= p.fundingGoal);
+
+        emit FundingClosed(projectId, p.goalReached, p.totalRaised);
+    }
+
+    /// @notice Sponsor withdraws raised capital if goal reached.
+    function withdrawCapital(uint256 projectId, uint256 amount)
+        external
+        onlySponsor(projectId)
+    {
+        Project storage p = projects[projectId];
+        require(p.fundingClosed, "Funding not closed");
+        require(p.goalReached, "Goal not reached");
+        require(amount <= p.totalRaised, "Amount too high");
+
+        p.totalRaised -= amount;
+        require(stablecoin.transfer(p.sponsor, amount), "Transfer failed");
+
+        emit CapitalWithdrawn(projectId, p.sponsor, amount);
+    }
+
     
 }
