@@ -185,5 +185,58 @@ contract RealEstateCrowdfundV2 {
         emit CapitalWithdrawn(projectId, p.sponsor, amount);
     }
 
+    // ----- REFUNDS -----
+
+    /// @notice If project fails (goal not reached), investors can get stablecoin back.
+    function claimRefund(uint256 projectId) external {
+        Project storage p = projects[projectId];
+        require(p.fundingClosed, "Funding not closed");
+        require(!p.goalReached, "Goal reached; no refund");
+        uint256 tokens = p.balances[msg.sender];
+        require(tokens > 0, "Nothing to refund");
+
+        // 1:1 mapping: tokens == invested stablecoin amount
+        p.balances[msg.sender] = 0;
+
+        require(stablecoin.transfer(msg.sender, tokens), "Refund failed");
+
+        emit RefundClaimed(projectId, msg.sender, tokens);
+    }
+
+    // ----- RETURNS DISTRIBUTION -----
+
+    /// @notice Sponsor deposits stablecoin profit to be distributed to token holders.
+    /// @dev Sponsor must approve this contract to pull "amount" stablecoin before calling.
+    function depositAndDistributeReturns(uint256 projectId, uint256 amount)
+        external
+        onlySponsor(projectId)
+    {
+        Project storage p = projects[projectId];
+        require(p.fundingClosed, "Funding not closed");
+        require(p.goalReached, "Goal not reached");
+        require(amount > 0, "Zero amount");
+        require(p.totalSupply > 0, "No tokens");
+
+        // Pull from sponsor
+        require(
+            stablecoin.transferFrom(msg.sender, address(this), amount),
+            "Transfer failed"
+        );
+
+        uint256 length = p.investors.length;
+        for (uint256 i = 0; i < length; i++) {
+            address investor = p.investors[i];
+            uint256 balance = p.balances[investor];
+            if (balance == 0) continue;
+
+            uint256 share = (amount * balance) / p.totalSupply;
+            if (share > 0) {
+                require(stablecoin.transfer(investor, share), "Payout failed");
+            }
+        }
+
+        emit ReturnsDistributed(projectId, amount);
+    }
+
     
 }
