@@ -123,5 +123,35 @@ contract RealEstateCrowdfundV2 {
         emit ProjectCreated(projectId, name, sponsor, fundingGoal, p.deadline);
     }
 
+    // ----- INVESTING -----
+
+    /// @notice Investor approves this contract for "amount" stablecoin, then calls invest().
+    function invest(uint256 projectId, uint256 amount) external {
+        Project storage p = projects[projectId];
+        require(!p.fundingClosed, "Funding closed");
+        require(block.timestamp <= p.deadline, "Deadline passed");
+        require(amount >= p.minInvestment, "Below min investment");
+
+        // Pull stablecoin from investor
+        require(
+            stablecoin.transferFrom(msg.sender, address(this), amount),
+            "Transfer failed"
+        );
+
+        // Simple 1:1 ratio: 1 unit stablecoin = 1 project token
+        uint256 tokensToMint = amount;
+
+        if (!p.isInvestor[msg.sender]) {
+            p.isInvestor[msg.sender] = true;
+            p.investors.push(msg.sender);
+        }
+
+        p.balances[msg.sender] += tokensToMint;
+        p.totalSupply += tokensToMint;
+        p.totalRaised += amount;
+
+        emit Invested(projectId, msg.sender, amount, tokensToMint);
+    }
+
     
 }
