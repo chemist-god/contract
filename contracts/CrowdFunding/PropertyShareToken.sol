@@ -27,5 +27,23 @@ contract PropertyShareToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
+    modifier onlyManager() {
+        require(msg.sender == manager, "Not manager");
+        _;
+    }
+
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        address _manager,
+        address _sponsor
+    ) {
+        require(_manager != address(0) && _sponsor != address(0), "Zero addr");
+        name = _name;
+        symbol = _symbol;
+        manager = _manager;
+        sponsor = _sponsor;
+    }
+
     
 }
