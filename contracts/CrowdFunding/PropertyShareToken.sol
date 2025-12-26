@@ -64,5 +64,22 @@ contract PropertyShareToken {
         return true;
     }
 
-    
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+        uint256 allowed = allowance[from][msg.sender];
+        require(allowed >= amount, "Allowance");
+        if (allowed != type(uint256).max) {
+            allowance[from][msg.sender] = allowed - amount;
+        }
+        _transfer(from, to, amount);
+        return true;
+    }
+
+    function _transfer(address from, address to, uint256 amount) internal {
+        require(to != address(0), "Zero to");
+        uint256 bal = balanceOf[from];
+        require(bal >= amount, "Balance");
+        balanceOf[from] = bal - amount;
+        balanceOf[to] += amount;
+        emit Transfer(from, to, amount);
+    }
 }
