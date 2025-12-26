@@ -238,5 +238,63 @@ contract RealEstateCrowdfundV2 {
         emit ReturnsDistributed(projectId, amount);
     }
 
-    
+    // ----- VIEW HELPERS & "ERC20-LIKE" READS -----
+
+    function getProjectInfo(uint256 projectId)
+        external
+        view
+        returns (
+            string memory name,
+            string memory metadataURI,
+            address sponsor,
+            uint256 fundingGoal,
+            uint256 minInvestment,
+            uint256 totalRaised,
+            uint256 deadline,
+            bool fundingClosed,
+            bool goalReached,
+            uint256 totalSupply
+        )
+    {
+        Project storage p = projects[projectId];
+        return (
+            p.name,
+            p.metadataURI,
+            p.sponsor,
+            p.fundingGoal,
+            p.minInvestment,
+            p.totalRaised,
+            p.deadline,
+            p.fundingClosed,
+            p.goalReached,
+            p.totalSupply
+        );
+    }
+
+    function getProjectInvestors(uint256 projectId)
+        external
+        view
+        returns (address[] memory)
+    {
+        return projects[projectId].investors;
+    }
+
+    function balanceOf(uint256 projectId, address investor)
+        external
+        view
+        returns (uint256)
+    {
+        return projects[projectId].balances[investor];
+    }
+
+    function investorShareWad(uint256 projectId, address investor)
+        external
+        view
+        returns (uint256)
+    {
+        Project storage p = projects[projectId];
+        if (p.totalSupply == 0) return 0;
+        // scaled by 1e18 for convenience
+        return (p.balances[investor] * 1e18) / p.totalSupply;
+    }
 }
