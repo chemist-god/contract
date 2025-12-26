@@ -45,5 +45,24 @@ contract PropertyShareToken {
         sponsor = _sponsor;
     }
 
+    // Mint only via manager during crowdfunding
+    function mint(address to, uint256 amount) external onlyManager {
+        totalSupply += amount;
+        balanceOf[to] += amount;
+        emit Transfer(address(0), to, amount);
+    }
+
+    // Standard ERC20 transfers
+    function transfer(address to, uint256 amount) external returns (bool) {
+        _transfer(msg.sender, to, amount);
+        return true;
+    }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        allowance[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
     
 }
