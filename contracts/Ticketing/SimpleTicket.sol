@@ -140,5 +140,21 @@ contract SimpleTicketSystem {
         emit TicketUsed(ticketId, msg.sender);
     }
     
+    function transferTicket(uint256 ticketId, address newOwner) external {
+        Ticket storage ticket = tickets[ticketId];
+        require(ticket.owner == msg.sender, "Not owner");
+        require(!ticket.isUsed, "Ticket used");
+        
+        Event storage eventInfo = events[ticket.eventId];
+        require(block.timestamp < eventInfo.startTime, "Event started");
+        
+        // Remove from old owner
+        _removeFromUserTickets(msg.sender, ticketId);
+        
+        // Add to new owner
+        ticket.owner = newOwner;
+        userTickets[newOwner].push(ticketId);
+    }
+    
     
 }
