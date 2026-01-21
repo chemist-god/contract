@@ -32,5 +32,11 @@ contract SimpleTicketSystem {
     mapping(address => uint256[]) public userTickets;
     mapping(uint256 => uint256[]) public eventTickets;
     
+    // ============ EVENTS ============
+    event EventCreated(uint256 indexed eventId, address organizer, string name);
+    event TicketPurchased(uint256 indexed ticketId, address buyer, uint256 eventId);
+    event TicketUsed(uint256 indexed ticketId, address user);
+    event EventCanceled(uint256 indexed eventId);
+    
     
 }
