@@ -156,5 +156,19 @@ contract SimpleTicketSystem {
         userTickets[newOwner].push(ticketId);
     }
     
+    // ============ HELPER FUNCTIONS ============
+    function _removeFromUserTickets(address user, uint256 ticketId) private {
+        uint256[] storage ticketsList = userTickets[user];
+        
+        for (uint256 i = 0; i < ticketsList.length; i++) {
+            if (ticketsList[i] == ticketId) {
+                // Move last element to current position
+                ticketsList[i] = ticketsList[ticketsList.length - 1];
+                ticketsList.pop();
+                break;
+            }
+        }
+    }
+    
     
 }
