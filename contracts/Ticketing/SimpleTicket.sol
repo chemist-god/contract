@@ -196,5 +196,35 @@ contract SimpleTicketSystem {
         );
     }
     
+    function getTicketDetails(uint256 ticketId) 
+        external 
+        view 
+        returns (
+            uint256 eventId,
+            address owner,
+            bool isUsed,
+            uint256 purchasePrice
+        ) 
+    {
+        Ticket storage t = tickets[ticketId];
+        return (
+            t.eventId,
+            t.owner,
+            t.isUsed,
+            t.purchasePrice
+        );
+    }
     
+    function getUserTickets(address user) external view returns (uint256[] memory) {
+        return userTickets[user];
+    }
+    
+    function getEventTickets(uint256 eventId) external view returns (uint256[] memory) {
+        return eventTickets[eventId];
+    }
+    
+    function getAvailableTickets(uint256 eventId) external view returns (uint256) {
+        Event storage e = events[eventId];
+        return e.maxTickets - e.ticketsSold;
+    }
 }
