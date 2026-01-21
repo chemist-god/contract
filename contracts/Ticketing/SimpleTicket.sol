@@ -170,5 +170,31 @@ contract SimpleTicketSystem {
         }
     }
     
+    // ============ VIEW FUNCTIONS ============
+    function getEventDetails(uint256 eventId) 
+        external 
+        view 
+        returns (
+            string memory name,
+            address organizer,
+            uint256 startTime,
+            uint256 ticketPrice,
+            uint256 maxTickets,
+            uint256 ticketsSold,
+            bool isCanceled
+        ) 
+    {
+        Event storage e = events[eventId];
+        return (
+            e.name,
+            e.organizer,
+            e.startTime,
+            e.ticketPrice,
+            e.maxTickets,
+            e.ticketsSold,
+            e.isCanceled
+        );
+    }
+    
     
 }
