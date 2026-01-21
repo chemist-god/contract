@@ -126,5 +126,19 @@ contract SimpleTicketSystem {
         emit TicketPurchased(ticketCounter, msg.sender, eventId);
     }
     
+    // ============ TICKET MANAGEMENT ============
+    function useTicket(uint256 ticketId) external {
+        Ticket storage ticket = tickets[ticketId];
+        require(ticket.owner == msg.sender, "Not owner");
+        require(!ticket.isUsed, "Already used");
+        
+        Event storage eventInfo = events[ticket.eventId];
+        require(!eventInfo.isCanceled, "Event canceled");
+        require(block.timestamp >= eventInfo.startTime, "Event not started yet");
+        
+        ticket.isUsed = true;
+        emit TicketUsed(ticketId, msg.sender);
+    }
+    
     
 }
