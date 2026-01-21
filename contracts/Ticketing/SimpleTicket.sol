@@ -23,5 +23,14 @@ contract SimpleTicketSystem {
         uint256 purchasePrice;
     }
     
+    // ============ STATE VARIABLES ============
+    uint256 private eventCounter;
+    uint256 private ticketCounter;
+    
+    mapping(uint256 => Event) public events;
+    mapping(uint256 => Ticket) public tickets;
+    mapping(address => uint256[]) public userTickets;
+    mapping(uint256 => uint256[]) public eventTickets;
+    
     
 }
