@@ -81,5 +81,15 @@ contract SimpleTicketSystem {
         return eventCounter;
     }
     
-  
+    function cancelEvent(uint256 eventId) 
+        external 
+        eventExists(eventId) 
+        onlyOrganizer(eventId) 
+    {
+        require(!events[eventId].isCanceled, "Already canceled");
+        events[eventId].isCanceled = true;
+        emit EventCanceled(eventId);
+    }
+    
+    
 }
