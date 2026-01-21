@@ -15,5 +15,13 @@ contract SimpleTicketSystem {
         bool isCanceled;
     }
     
+    struct Ticket {
+        uint256 id;
+        uint256 eventId;
+        address owner;
+        bool isUsed;
+        uint256 purchasePrice;
+    }
+    
     
 }
