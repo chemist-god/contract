@@ -38,5 +38,21 @@ contract SimpleTicketSystem {
     event TicketUsed(uint256 indexed ticketId, address user);
     event EventCanceled(uint256 indexed eventId);
     
+    // ============ MODIFIERS ============
+    modifier onlyOrganizer(uint256 eventId) {
+        require(events[eventId].organizer == msg.sender, "Not organizer");
+        _;
+    }
+    
+    modifier eventExists(uint256 eventId) {
+        require(events[eventId].organizer != address(0), "Event not found");
+        _;
+    }
+    
+    modifier notCanceled(uint256 eventId) {
+        require(!events[eventId].isCanceled, "Event canceled");
+        _;
+    }
+    
     
 }
