@@ -54,5 +54,32 @@ contract SimpleTicketSystem {
         _;
     }
     
+    // ============ EVENT MANAGEMENT ============
+    function createEvent(
+        string memory name,
+        uint256 startTime,
+        uint256 ticketPrice,
+        uint256 maxTickets
+    ) external returns (uint256) {
+        require(startTime > block.timestamp, "Start time must be future");
+        require(maxTickets > 0, "Must have tickets");
+        
+        eventCounter++;
+        
+        events[eventCounter] = Event({
+            id: eventCounter,
+            organizer: msg.sender,
+            name: name,
+            startTime: startTime,
+            ticketPrice: ticketPrice,
+            maxTickets: maxTickets,
+            ticketsSold: 0,
+            isCanceled: false
+        });
+        
+        emit EventCreated(eventCounter, msg.sender, name);
+        return eventCounter;
+    }
     
+  
 }
