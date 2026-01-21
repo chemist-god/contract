@@ -91,5 +91,40 @@ contract SimpleTicketSystem {
         emit EventCanceled(eventId);
     }
     
+    // ============ TICKET PURCHASE ============
+    function buyTicket(uint256 eventId) 
+        external 
+        payable 
+        eventExists(eventId) 
+        notCanceled(eventId) 
+    {
+        Event storage eventInfo = events[eventId];
+        
+        require(msg.value == eventInfo.ticketPrice, "Wrong price");
+        require(block.timestamp < eventInfo.startTime, "Event started");
+        require(eventInfo.ticketsSold < eventInfo.maxTickets, "Sold out");
+        
+        // Create ticket
+        ticketCounter++;
+        
+        tickets[ticketCounter] = Ticket({
+            id: ticketCounter,
+            eventId: eventId,
+            owner: msg.sender,
+            isUsed: false,
+            purchasePrice: msg.value
+        });
+        
+        // Update counts
+        eventInfo.ticketsSold++;
+        userTickets[msg.sender].push(ticketCounter);
+        eventTickets[eventId].push(ticketCounter);
+        
+        // Transfer funds to organizer
+        payable(eventInfo.organizer).transfer(msg.value);
+        
+        emit TicketPurchased(ticketCounter, msg.sender, eventId);
+    }
+    
     
 }
