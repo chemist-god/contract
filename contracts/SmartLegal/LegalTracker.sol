@@ -38,5 +38,11 @@ contract LegalDeadlineTracker {
         bool isActive;
     }
     
+    // --- State Variables ---
     
+    uint256 private matterCounter;
+    uint256 private deadlineCounter;
+    uint256 private licenseCounter;
+    
+   
 }
