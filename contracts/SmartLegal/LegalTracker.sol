@@ -7,5 +7,36 @@ pragma solidity ^0.8.30;
  */
 contract LegalDeadlineTracker {
     
-   
+    // --- Structs ---
+    
+    struct Matter {
+        uint256 id;
+        string matterNumber;
+        string clientName;
+        string lawyerName;
+        uint256 createdAt;
+        bool isActive;
+    }
+    
+    struct Deadline {
+        uint256 id;
+        uint256 matterId;
+        string description;
+        uint256 deadlineDate;
+        uint256 reminderDate;
+        bool isCompleted;
+        string deadlineType; // "filing", "hearing", "renewal", etc.
+    }
+    
+    struct License {
+        uint256 id;
+        uint256 matterId;
+        string licenseType;
+        string licenseNumber;
+        uint256 expiryDate;
+        uint256 renewalDate;
+        bool isActive;
+    }
+    
+    
 }
