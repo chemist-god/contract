@@ -44,5 +44,16 @@ contract LegalDeadlineTracker {
     uint256 private deadlineCounter;
     uint256 private licenseCounter;
     
-   
+    // Mappings
+    mapping(uint256 => Matter) public matters;
+    mapping(uint256 => Deadline) public deadlines;
+    mapping(uint256 => License) public licenses;
+    
+    // Deadlines by matter
+    mapping(uint256 => uint256[]) public deadlinesByMatter;
+    
+    // Licenses by matter
+    mapping(uint256 => uint256[]) public licensesByMatter;
+    
+    
 }
